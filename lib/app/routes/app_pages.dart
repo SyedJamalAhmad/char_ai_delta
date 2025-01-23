@@ -23,6 +23,7 @@ import '../modules/intro_screens/views/intro_screens_view.dart';
 import '../modules/views/create_avatar.dart';
 import '../modules/views/gems_view.dart';
 import '../modules/views/gf_chat_view.dart';
+import '../modules/views/home_carousel_view.dart';
 import '../modules/views/home_view.dart';
 import '../modules/views/nav_view.dart';
 import '../modules/views/settings_view.dart';
@@ -47,6 +48,11 @@ class AppPages {
     GetPage(
       name: _Paths.HomeView,
       page: () => HomeView(),
+      binding: HomeViewBinding(),
+    ),
+      GetPage(
+      name: _Paths.HomeCarouselView,
+      page: () => HomeCarouselView(),
       binding: HomeViewBinding(),
     ),
     GetPage(
