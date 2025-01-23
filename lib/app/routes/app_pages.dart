@@ -1,13 +1,8 @@
 import 'package:character_ai_delta/app/modules/Admin/admin_character/bindings/admin_char_editbinding.dart';
 import 'package:character_ai_delta/app/modules/Admin/admin_character/views/admin_charecter_editview.dart';
-import 'package:character_ai_delta/app/modules/bindings/home_view_slider_binding.dart';
-import 'package:character_ai_delta/app/modules/bindings/new_gf_chat_binding.dart';
 import 'package:character_ai_delta/app/modules/new_gems_screen/new_gems_view.dart';
-import 'package:character_ai_delta/app/modules/views/home_view_slider.dart';
-import 'package:character_ai_delta/app/modules/views/new_gf_chat_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-
 import '../modules/Admin/admin_character/bindings/admin_character_binding.dart';
 import '../modules/Admin/admin_character/views/admin_character_view.dart';
 import '../modules/Admin/binding/admin_home_binding.dart';
@@ -109,16 +104,7 @@ class AppPages {
       page: () => AdminCharEditView(),
       binding: AdminCharEditBinding(),
     ),
-    GetPage(
-      name: _Paths.HOMEVIEWSLIDER,
-      page: () => HomeViewSlider(),
-      binding: HomeViewSliderBinding(),
-    ),
-     GetPage(
-      name: _Paths. NEWGFCHATVIEW,
-      page: () => NewGfChatView(arguments: [],),
-      binding: NewGfChatBinding(),
-    ),
+   
     GetPage(
       name: _Paths.NEWGEMSVIEW,
       page: () => newGemsView(),

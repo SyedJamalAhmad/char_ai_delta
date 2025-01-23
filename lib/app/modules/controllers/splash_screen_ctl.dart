@@ -127,11 +127,9 @@ class SplashController extends GetxController {
 
       print("Is First Time from Init: $isFirstTime");
       if (isFirstTime) {
-        // Get.offNamed(Routes.HomeView);
-        Get.offNamed(Routes.HOMEVIEWSLIDER);
+        Get.offNamed(Routes.HomeView);
       } else {
-        // Get.offNamed(Routes.HomeView);
-        Get.offNamed(Routes.HOMEVIEWSLIDER);
+        Get.offNamed(Routes.HomeView);
       }
     });
   }

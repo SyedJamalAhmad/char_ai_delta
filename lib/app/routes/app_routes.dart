@@ -17,8 +17,6 @@ abstract class Routes {
   static const INTRO_SCREENS = _Paths.INTRO_SCREENS;
   static const ADMIN_CHARACTER = _Paths.ADMIN_CHARACTER;
   static const AdminCharEditView = _Paths.AdminCharEditView;
-  static const HOMEVIEWSLIDER = _Paths.HOMEVIEWSLIDER;
-  static const NEWGFCHATVIEW = _Paths.NEWGFCHATVIEW;
   static const NEWGEMSVIEW = _Paths.NEWGEMSVIEW;
 }
 
@@ -38,7 +36,5 @@ abstract class _Paths {
   static const INTRO_SCREENS = '/intro-screens';
   static const ADMIN_CHARACTER = '/admin-character';
   static const AdminCharEditView = '/AdminCharEditView';
-  static const HOMEVIEWSLIDER = '/HOMEVIEWSLIDER';
-  static const NEWGFCHATVIEW = '/NEWGFCHATVIEW';
   static const NEWGEMSVIEW = '/NEWGEMSVIEW';
 }

@@ -2,7 +2,6 @@ import 'package:applovin_max/applovin_max.dart';
 import 'package:character_ai_delta/app/modules/controllers/settings_ctl.dart';
 import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
