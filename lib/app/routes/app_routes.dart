@@ -4,6 +4,7 @@ abstract class Routes {
   Routes._();
   static const SplashScreen = _Paths.SplashScreen;
   static const HomeView = _Paths.HomeView;
+  static const HomeCarouselView = _Paths.HomeCarouselView;
   static const GemsView = _Paths.GemsView;
   static const GfChatView = _Paths.GfChatView;
   // static const ChatScreen = _Paths.ChatScreen;
@@ -23,6 +24,7 @@ abstract class Routes {
 abstract class _Paths {
   static const SplashScreen = '/SplashScreen';
   static const HomeView = '/HomeView';
+  static const HomeCarouselView = '/HomeCarouselView';
   static const GemsView = '/GemsView';
   static const GfChatView = '/GfChatView';
   // static const ChatScreen = '/ChatScreen';
