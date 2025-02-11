@@ -41,49 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDV0tpnnw6NPaFdbwH9z_ciCB8b0sDG3fc',
-    appId: '1:143989401243:web:21ea24b2070124f793c83e',
-    messagingSenderId: '143989401243',
-    projectId: 'character-ai-delta',
-    authDomain: 'character-ai-delta.firebaseapp.com',
-    storageBucket: 'character-ai-delta.firebasestorage.app',
-    measurementId: 'G-18ZSHR8W1D',
+    apiKey: 'AIzaSyAupalWZvj8xvCj3hVX9xhm9oW9i4Zy4EM',
+    appId: '1:601471141084:web:5e0502bf4e8f3f75692019',
+    messagingSenderId: '601471141084',
+    projectId: 'characterai-gamma',
+    authDomain: 'characterai-gamma.firebaseapp.com',
+    storageBucket: 'characterai-gamma.firebasestorage.app',
+    measurementId: 'G-HSVJTTS9V3',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC01cZIMh2Tv3k_xw4KzYGOGlDSRc0ZvQw',
-    appId: '1:143989401243:android:bea6d2d0a9d9f70b93c83e',
-    messagingSenderId: '143989401243',
-    projectId: 'character-ai-delta',
-    storageBucket: 'character-ai-delta.firebasestorage.app',
+    apiKey: 'AIzaSyAOpIyswZgsvnBqXALw8Xq8ivXI-sENkUo',
+    appId: '1:601471141084:android:853e63345d7857f1692019',
+    messagingSenderId: '601471141084',
+    projectId: 'characterai-gamma',
+    storageBucket: 'characterai-gamma.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAaGMaoVQc-_JM79B4MhL3XM7OgBNMIsDU',
-    appId: '1:143989401243:ios:e7af1a3e230c37ea93c83e',
-    messagingSenderId: '143989401243',
-    projectId: 'character-ai-delta',
-    storageBucket: 'character-ai-delta.firebasestorage.app',
+    apiKey: 'AIzaSyBKk5uuEAl70ijsr-lPV-2j7f5kyyImnjg',
+    appId: '1:601471141084:ios:c68e22f9ade88fdb692019',
+    messagingSenderId: '601471141084',
+    projectId: 'characterai-gamma',
+    storageBucket: 'characterai-gamma.firebasestorage.app',
     iosBundleId: 'com.example.characterAiDelta',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAaGMaoVQc-_JM79B4MhL3XM7OgBNMIsDU',
-    appId: '1:143989401243:ios:e7af1a3e230c37ea93c83e',
-    messagingSenderId: '143989401243',
-    projectId: 'character-ai-delta',
-    storageBucket: 'character-ai-delta.firebasestorage.app',
+    apiKey: 'AIzaSyBKk5uuEAl70ijsr-lPV-2j7f5kyyImnjg',
+    appId: '1:601471141084:ios:c68e22f9ade88fdb692019',
+    messagingSenderId: '601471141084',
+    projectId: 'characterai-gamma',
+    storageBucket: 'characterai-gamma.firebasestorage.app',
     iosBundleId: 'com.example.characterAiDelta',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDV0tpnnw6NPaFdbwH9z_ciCB8b0sDG3fc',
-    appId: '1:143989401243:web:312c35853259a2f593c83e',
-    messagingSenderId: '143989401243',
-    projectId: 'character-ai-delta',
-    authDomain: 'character-ai-delta.firebaseapp.com',
-    storageBucket: 'character-ai-delta.firebasestorage.app',
-    measurementId: 'G-CBDN1KLBRN',
+    apiKey: 'AIzaSyAupalWZvj8xvCj3hVX9xhm9oW9i4Zy4EM',
+    appId: '1:601471141084:web:d7528583f4acacfb692019',
+    messagingSenderId: '601471141084',
+    projectId: 'characterai-gamma',
+    authDomain: 'characterai-gamma.firebaseapp.com',
+    storageBucket: 'characterai-gamma.firebasestorage.app',
+    measurementId: 'G-CJYPE5LBCQ',
   );
 
 }
