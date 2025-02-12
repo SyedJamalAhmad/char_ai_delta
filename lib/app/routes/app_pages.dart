@@ -34,10 +34,10 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.SplashScreen; //? For User Build
+  // static const INITIAL = Routes.SplashScreen; //? For User Build
   // static const INITIAL = Routes.AdminHomeView; //? For Admin Build
-  // static const INITIAL =
-  // kDebugMode ? Routes.AdminHomeView : Routes.SplashScreen; //
+  static const INITIAL =
+  kDebugMode ? Routes.AdminHomeView : Routes.SplashScreen; //
 
   static final routes = [
     GetPage(
