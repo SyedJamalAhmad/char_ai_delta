@@ -58,7 +58,7 @@ dependencies:
   # launch_review: ^3.0.1
   # applovin_max: ^3.3.0
   applovin_max: ^3.10.0
-  firebase_core: ^2.17.0
+  firebase_core: ^2.32.0
   firebase_analytics: ^10.5.1
   # flutter_gemini: ^1.0.1
   # flutter_gemini: ^2.0.1
