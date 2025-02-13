@@ -36,8 +36,8 @@ class AppPages {
 
   // static const INITIAL = Routes.SplashScreen; //? For User Build
   // static const INITIAL = Routes.AdminHomeView; //? For Admin Build
-  static const INITIAL =
-  kDebugMode ? Routes.AdminHomeView : Routes.SplashScreen; //
+  // static const INITIAL =
+  //     kDebugMode ? Routes.AdminHomeView : Routes.SplashScreen;
 
   static final routes = [
     GetPage(
@@ -50,7 +50,7 @@ class AppPages {
       page: () => HomeView(),
       binding: HomeViewBinding(),
     ),
-      GetPage(
+    GetPage(
       name: _Paths.HomeCarouselView,
       page: () => HomeCarouselView(),
       binding: HomeViewBinding(),
@@ -110,7 +110,6 @@ class AppPages {
       page: () => AdminCharEditView(),
       binding: AdminCharEditBinding(),
     ),
-   
     GetPage(
       name: _Paths.NEWGEMSVIEW,
       page: () => newGemsView(),
