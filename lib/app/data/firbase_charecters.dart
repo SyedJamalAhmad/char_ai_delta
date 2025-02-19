@@ -1,6 +1,7 @@
 class FirebaseCharecter {
   String title;
   String description;
+  String? animationUrl;
   String firstMessage;
   String intro;
   String category;
@@ -19,6 +20,7 @@ class FirebaseCharecter {
   FirebaseCharecter(
       {required this.title,
       required this.description,
+      this.animationUrl,
       required this.firstMessage,
       required this.intro,
       required this.category,
@@ -38,6 +40,7 @@ class FirebaseCharecter {
   Map<String, dynamic> toJson() => {
         'title': title,
         'description': description,
+        'animationUrl': animationUrl ?? "",
         'firstMessage': firstMessage,
         'intro': intro,
         'category': category,
@@ -59,6 +62,7 @@ class FirebaseCharecter {
       FirebaseCharecter(
         title: json['title'],
         description: json['description'],
+        animationUrl: json['animationUrl'] ?? "",
         firstMessage: json['firstMessage'],
         intro: json['intro'],
         category: json['category'],

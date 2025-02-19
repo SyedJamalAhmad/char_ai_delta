@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:markdown_widget/widget/markdown.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../routes/app_pages.dart';
 import '../../utills/colors.dart';
@@ -62,6 +63,19 @@ class GfChatView extends GetView<GfChatViewController> {
               ),
               child: Stack(
                 children: [
+                  Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: controller.showVideo.value
+                          ? controller.isVideoControllerInitialized.value
+                              ? AspectRatio(
+                                  aspectRatio: controller
+                                      .videoController.value.aspectRatio,
+                                  child:
+                                      VideoPlayer(controller.videoController),
+                                )
+                              : Center()
+                          : Container()),
                   // Obx(() => Container(
                   //       width: SizeConfig.screenWidth,
                   //       height: SizeConfig.screenHeight,
@@ -307,7 +321,7 @@ class GfChatView extends GetView<GfChatViewController> {
             Container(
               // margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.1),
               child: Text(
-                "Note: This is AI Generated Connent",
+                "Note: This is AI Generated Content",
                 style: StyleSheet.noteHeading,
               ),
             ),

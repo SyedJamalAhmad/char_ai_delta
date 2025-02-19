@@ -35,6 +35,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 
 // import 'package:internet_connection_checker/internet_connection_checker.dart';
 
@@ -194,6 +195,34 @@ class GfChatViewController extends GetxController
   RxBool premiumUser = false.obs;
   FocusNode textFieldFocusNode = FocusNode();
 
+  RxString mainImage = ''.obs;
+  RxBool showVideo = false.obs;
+  late VideoPlayerController videoController;
+  RxBool isVideoControllerInitialized = false.obs;
+
+  void initializeVideo(String videoUrl) {
+    isVideoControllerInitialized.value = false;
+    if (videoUrl.isNotEmpty) {
+      showVideo.value = true;
+      videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
+        ..initialize().then((_) {
+          isVideoControllerInitialized.value = true;
+          videoController.play();
+          update();
+        });
+
+      videoController.addListener(() {
+        if (videoController.value.position >= videoController.value.duration) {
+          isVideoControllerInitialized.value = false;
+          showVideo.value = false;
+          update();
+        }
+      });
+    } else {
+      showVideo.value = false;
+    }
+  }
+
   @override
   Future<void> onInit() async {
     final argument = Get.arguments;
@@ -221,10 +250,14 @@ class GfChatViewController extends GetxController
       if (argument != null) {
         if (argument[1] is FirebaseCharecter) {
           firebaseCharecter = argument[1];
+          if (firebaseCharecter!.animationUrl! != "") {
+            initializeVideo(firebaseCharecter!.animationUrl!);
+          }
 
           isLoved.value = await getIsLoved(firebaseCharecter!.title);
 
-          developer.log("FirebaseCharecter: ${firebaseCharecter!.toJson()}");
+          developer.log(
+              "FirebaseCharecter: ${firebaseCharecter!.toJson()} This is show video : ${showVideo.value}");
         }
       }
     } on Exception catch (e) {

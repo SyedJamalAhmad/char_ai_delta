@@ -238,113 +238,113 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
     );
   }
 
-  CarouselSlider carouselCharacterSlider() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: SizeConfig.screenHeight,
-        // enlargeCenterPage: true,
-        // autoPlay: true,
-        // aspectRatio: 16 / 9,
-        autoPlayCurve: Curves.fastOutSlowIn,
-        // enableInfiniteScroll: true,
-        // autoPlayAnimationDuration: Duration(milliseconds: 800),
-        viewportFraction: 1,
-      ),
-      items: [
-        // Container(
-        //   child: Image.asset("assets/images/gem.png")
-        // ),
-        Stack(children: [
-          Container(
-            decoration: BoxDecoration(
-              // borderRadius: BorderRadius.circular(10),
-              color: Colors.red,
-            ),
-            height: SizeConfig.screenHeight,
-            width: SizeConfig.screenWidth,
-            alignment: Alignment.center,
-            // padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 3),
-            child: Image.asset("assets/images/gem.png"),
-          ),
-          Container(
-            padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Platform.isAndroid || Platform.isIOS
-                //     ?
-                Flexible(
-                  flex: 1,
-                  child: Text(
-                    'Character AI',
-                    style: TextStyle(
-                      color: Color(0xFFFFFFFF), // #FFF in hexadecimal
-                      fontFamily:
-                          'Iceland', // make sure to add the font file to your project
-                      fontSize: 25.0, // in logical pixels
-                      fontStyle: FontStyle.normal,
-                      fontWeight: FontWeight.bold,
-                      // w400, // normal weight
-                      height: 1.0, // normal line height
-                    ),
-                  ),
-                ),
-                horizontalSpace(SizeConfig.blockSizeHorizontal),
+  // CarouselSlider carouselCharacterSlider() {
+  //   return CarouselSlider(
+  //     options: CarouselOptions(
+  //       height: SizeConfig.screenHeight,
+  //       // enlargeCenterPage: true,
+  //       // autoPlay: true,
+  //       // aspectRatio: 16 / 9,
+  //       autoPlayCurve: Curves.fastOutSlowIn,
+  //       // enableInfiniteScroll: true,
+  //       // autoPlayAnimationDuration: Duration(milliseconds: 800),
+  //       viewportFraction: 1,
+  //     ),
+  //     items: [
+  //       // Container(
+  //       //   child: Image.asset("assets/images/gem.png")
+  //       // ),
+  //       Stack(children: [
+  //         Container(
+  //           decoration: BoxDecoration(
+  //             // borderRadius: BorderRadius.circular(10),
+  //             color: Colors.red,
+  //           ),
+  //           height: SizeConfig.screenHeight,
+  //           width: SizeConfig.screenWidth,
+  //           alignment: Alignment.center,
+  //           // padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 3),
+  //           child: Image.asset("assets/images/gem.png"),
+  //         ),
+  //         Container(
+  //           padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 5),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               // Platform.isAndroid || Platform.isIOS
+  //               //     ?
+  //               Flexible(
+  //                 flex: 1,
+  //                 child: Text(
+  //                   'Character AI',
+  //                   style: TextStyle(
+  //                     color: Color(0xFFFFFFFF), // #FFF in hexadecimal
+  //                     fontFamily:
+  //                         'Iceland', // make sure to add the font file to your project
+  //                     fontSize: 25.0, // in logical pixels
+  //                     fontStyle: FontStyle.normal,
+  //                     fontWeight: FontWeight.bold,
+  //                     // w400, // normal weight
+  //                     height: 1.0, // normal line height
+  //                   ),
+  //                 ),
+  //               ),
+  //               horizontalSpace(SizeConfig.blockSizeHorizontal),
 
-                Platform.isIOS
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Get.toNamed(Routes.GemsView);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.bottomNavColor,
-                                border:
-                                    Border.all(color: Colors.white, width: 0.3),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      height: SizeConfig.screenHeight * 0.03,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          AppImages.gems,
-                                          scale: 30,
-                                        ),
-                                        Obx(
-                                          () => Text(
-                                            " ${controller.gems.value}",
-                                            style:
-                                                StyleSheet.Intro_Sub_heading2,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: SizeConfig.screenWidth * 0.01,
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-              ],
-            ),
-          ),
-        ]),
-      ],
-    );
-  }
+  //               Platform.isIOS
+  //                   ? Container()
+  //                   : Row(
+  //                       mainAxisAlignment: MainAxisAlignment.start,
+  //                       children: [
+  //                         GestureDetector(
+  //                           onTap: () {
+  //                             Get.toNamed(Routes.GemsView);
+  //                           },
+  //                           child: Container(
+  //                             decoration: BoxDecoration(
+  //                               color: AppColors.bottomNavColor,
+  //                               border:
+  //                                   Border.all(color: Colors.white, width: 0.3),
+  //                               borderRadius: BorderRadius.circular(8.0),
+  //                             ),
+  //                             child: Padding(
+  //                               padding: const EdgeInsets.all(10.0),
+  //                               child: Row(
+  //                                 mainAxisAlignment: MainAxisAlignment.center,
+  //                                 children: [
+  //                                   SizedBox(
+  //                                     height: SizeConfig.screenHeight * 0.03,
+  //                                   ),
+  //                                   Row(
+  //                                     children: [
+  //                                       Image.asset(
+  //                                         AppImages.gems,
+  //                                         scale: 30,
+  //                                       ),
+  //                                       Obx(
+  //                                         () => Text(
+  //                                           " ${controller.gems.value}",
+  //                                           style:
+  //                                               StyleSheet.Intro_Sub_heading2,
+  //                                         ),
+  //                                       ),
+  //                                       SizedBox(
+  //                                         width: SizeConfig.screenWidth * 0.01,
+  //                                       )
+  //                                     ],
+  //                                   )
+  //                                 ],
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //             ],
+  //           ),
+  //         ),
+  //       ]),
+  //     ],
+  //   );
+  // }
 }
