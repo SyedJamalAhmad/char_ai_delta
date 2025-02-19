@@ -77,7 +77,7 @@ dependencies:
   shared_preferences: ^2.2.2
   device_info_plus: ^10.1.2
   markdown_widget: ^2.3.2+3
-  easy_audience_network: ^0.0.6
+  easy_audience_network: ^0.0.7
   intro_screen_onboarding_flutter: ^1.0.0
   slide_rating_dialog: ^1.0.4
   google_generative_ai: ^0.4.3
@@ -96,6 +96,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  change_app_package_name: ^1.4.0
+  flutter_launcher_icons: ^0.14.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
