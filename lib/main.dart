@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:character_ai_delta/app/provider/connection_provider.dart';
 import 'package:character_ai_delta/app/services/remoteconfig_services.dart';
 import 'package:character_ai_delta/firebase_options.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   // Gemini.init(
@@ -80,7 +82,12 @@ Future<void> main() async {
     return true;
   };
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => ConnectionProvider()),
+    ],
+    child: MyApp(),
+  ));
 }
 
 @pragma('vm:entry-point')

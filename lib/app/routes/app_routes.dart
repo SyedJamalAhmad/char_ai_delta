@@ -19,6 +19,7 @@ abstract class Routes {
   static const ADMIN_CHARACTER = _Paths.ADMIN_CHARACTER;
   static const AdminCharEditView = _Paths.AdminCharEditView;
   static const NEWGEMSVIEW = _Paths.NEWGEMSVIEW;
+  static const noConnectionView = _Paths.noConnectionView;
 }
 
 abstract class _Paths {
@@ -39,4 +40,5 @@ abstract class _Paths {
   static const ADMIN_CHARACTER = '/admin-character';
   static const AdminCharEditView = '/AdminCharEditView';
   static const NEWGEMSVIEW = '/NEWGEMSVIEW';
+  static const noConnectionView = '/noConnectionView';
 }
