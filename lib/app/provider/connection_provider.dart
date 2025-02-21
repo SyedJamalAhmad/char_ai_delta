@@ -27,7 +27,7 @@ class ConnectionProvider with ChangeNotifier {
     } else {
       developer.log("Changing isConnect to false");
       _isConnect = condition;
-      Get.toNamed(Routes.noConnectionView);
+      // Get.toNamed(Routes.noConnectionView);
     }
     notifyListeners();
   }

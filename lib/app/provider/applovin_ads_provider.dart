@@ -61,7 +61,6 @@ class AppLovinProvider {
       attachAdListeners();
       AppLovinMAX.loadInterstitial(_interstitial_ad_unit_id);
       AppLovinMAX.loadRewardedAd(AppStrings.MAX_Reward_ID);
-
       //  AppLovinMAX.createMRec(AppStrings.MAX_MREC_ID, AdViewPosition.centered);
       // AppLovinMAX.createBanner(
       //     AppStrings.MAX_BANNER_ID, AdViewPosition.bottomCenter);

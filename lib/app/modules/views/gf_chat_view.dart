@@ -69,8 +69,7 @@ class GfChatView extends GetView<GfChatViewController> {
                       child: controller.showVideo.value
                           ? controller.isVideoControllerInitialized.value
                               ? AspectRatio(
-                                  aspectRatio: controller
-                                      .videoController.value.aspectRatio,
+                                  aspectRatio: 16.0 / 9.0,
                                   child:
                                       VideoPlayer(controller.videoController),
                                 )
