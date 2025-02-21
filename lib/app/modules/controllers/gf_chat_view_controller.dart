@@ -697,7 +697,8 @@ class GfChatViewController extends GetxController
         generatedMessage = getRandomDenielMessage();
       } else {
         generatedMessage = text;
-        homectl.decreaseGEMS(GEMS_RATE.NormalChat_GEMS_RATE);
+        // [[[[[[[[[[Commented by Jamal Temp]]]]]]]]]]
+        // homectl.decreaseGEMS(GEMS_RATE.NormalChat_GEMS_RATE);
         developer.log(
             "Token Consumed: ${response.usageMetadata!.totalTokenCount ?? 0}");
       }

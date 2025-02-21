@@ -1,6 +1,7 @@
 import 'package:character_ai_delta/app/modules/Admin/admin_character/bindings/admin_char_editbinding.dart';
 import 'package:character_ai_delta/app/modules/Admin/admin_character/views/admin_charecter_editview.dart';
 import 'package:character_ai_delta/app/modules/new_gems_screen/new_gems_view.dart';
+import 'package:character_ai_delta/app/modules/views/no_connection_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import '../modules/Admin/admin_character/bindings/admin_character_binding.dart';
@@ -113,6 +114,11 @@ class AppPages {
     GetPage(
       name: _Paths.NEWGEMSVIEW,
       page: () => newGemsView(),
+      // binding:(),
+    ),
+    GetPage(
+      name: _Paths.noConnectionView,
+      page: () => NoConnectionView(),
       // binding:(),
     ),
   ];

@@ -1,7 +1,9 @@
 import 'package:character_ai_delta/app/modules/controllers/splash_screen_ctl.dart';
+import 'package:character_ai_delta/app/provider/connection_provider.dart';
 import 'package:character_ai_delta/app/utills/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import '../../utills/images.dart';
 import '../../utills/size_config.dart';
@@ -14,8 +16,10 @@ class SplashScreen extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-
+    Provider.of<ConnectionProvider>(context, listen: false)
+        .setIgnoreConnectionCheck(true);
     return Scaffold(
+      
       body: Container(
         width: SizeConfig.screenWidth,
         height: SizeConfig.screenHeight,
@@ -56,14 +60,14 @@ class SplashScreen extends GetView<SplashController> {
                   Padding(
                     padding:
                         EdgeInsets.only(top: SizeConfig.blockSizeVertical * 15),
-                    child: Text("RolePlay Friend AI",
+                    child: Text("RolePlay AI Friend",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: SizeConfig.blockSizeHorizontal * 6,
                             fontWeight: FontWeight.bold)),
                   ),
                   verticalSpace(SizeConfig.blockSizeVertical * 1),
-                  Text("Your favorite, your adventure!",
+                  Text("Your journey, your story!",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: SizeConfig.blockSizeHorizontal * 4,
