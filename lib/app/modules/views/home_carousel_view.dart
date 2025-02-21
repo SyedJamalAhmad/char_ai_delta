@@ -186,55 +186,55 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                 ),
               ),
               horizontalSpace(SizeConfig.blockSizeHorizontal),
-
-              Platform.isIOS
-                  ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Get.toNamed(Routes.GemsView);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.bottomNavColor,
-                              border:
-                                  Border.all(color: Colors.white, width: 0.3),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: SizeConfig.screenHeight * 0.03,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        AppImages.gems,
-                                        scale: 30,
-                                      ),
-                                      Obx(
-                                        () => Text(
-                                          " ${controller.gems.value}",
-                                          style: StyleSheet.Intro_Sub_heading2,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: SizeConfig.screenWidth * 0.01,
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+// [[[[[[[[[[[[[[[[[Commented by Jammal Temp]]]]]]]]]]]]]]]]]
+              // Platform.isIOS
+              //     ? Container()
+              //     : Row(
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         children: [
+              //           GestureDetector(
+              //             onTap: () {
+              //               Get.toNamed(Routes.GemsView);
+              //             },
+              //             child: Container(
+              //               decoration: BoxDecoration(
+              //                 color: AppColors.bottomNavColor,
+              //                 border:
+              //                     Border.all(color: Colors.white, width: 0.3),
+              //                 borderRadius: BorderRadius.circular(8.0),
+              //               ),
+              //               child: Padding(
+              //                 padding: const EdgeInsets.all(10.0),
+              //                 child: Row(
+              //                   mainAxisAlignment: MainAxisAlignment.center,
+              //                   children: [
+              //                     SizedBox(
+              //                       height: SizeConfig.screenHeight * 0.03,
+              //                     ),
+              //                     Row(
+              //                       children: [
+              //                         Image.asset(
+              //                           AppImages.gems,
+              //                           scale: 30,
+              //                         ),
+              //                         Obx(
+              //                           () => Text(
+              //                             " ${controller.gems.value}",
+              //                             style: StyleSheet.Intro_Sub_heading2,
+              //                           ),
+              //                         ),
+              //                         SizedBox(
+              //                           width: SizeConfig.screenWidth * 0.01,
+              //                         )
+              //                       ],
+              //                     )
+              //                   ],
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //         ],
+              //       ),
             ],
           ),
         ),

@@ -294,26 +294,28 @@ class GfChatView extends GetView<GfChatViewController> {
                   //       ),
                   //     )),
                   horizontalSpace(SizeConfig.blockSizeHorizontal * 1.5),
-                  Obx(() => GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.GemsView);
-                        },
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              AppImages.gems,
-                              scale: 30,
-                            ),
-                            Text(
-                              " ${controller.homectl.gems.value}",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SizedBox(
-                              width: SizeConfig.screenWidth * 0.03,
-                            )
-                          ],
-                        ),
-                      ))
+
+                  //[[[[[[[[[[[[[[[[[[Commented by Jamal Temp]]]]]]]]]]]]]]]]]]
+                  // Obx(() => GestureDetector(
+                  //       onTap: () {
+                  //         Get.toNamed(Routes.GemsView);
+                  //       },
+                  //       child: Row(
+                  //         children: [
+                  //           Image.asset(
+                  //             AppImages.gems,
+                  //             scale: 30,
+                  //           ),
+                  //           Text(
+                  //             " ${controller.homectl.gems.value}",
+                  //             style: TextStyle(color: Colors.white),
+                  //           ),
+                  //           SizedBox(
+                  //             width: SizeConfig.screenWidth * 0.03,
+                  //           )
+                  //         ],
+                  //       ),
+                  //     ))
                 ],
               ),
             ),

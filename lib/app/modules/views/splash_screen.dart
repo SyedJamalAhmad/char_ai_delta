@@ -19,6 +19,7 @@ class SplashScreen extends GetView<SplashController> {
     Provider.of<ConnectionProvider>(context, listen: false)
         .setIgnoreConnectionCheck(true);
     return Scaffold(
+      
       body: Container(
         width: SizeConfig.screenWidth,
         height: SizeConfig.screenHeight,
@@ -59,14 +60,14 @@ class SplashScreen extends GetView<SplashController> {
                   Padding(
                     padding:
                         EdgeInsets.only(top: SizeConfig.blockSizeVertical * 15),
-                    child: Text("RolePlay Friend AI",
+                    child: Text("RolePlay AI Friend",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: SizeConfig.blockSizeHorizontal * 6,
                             fontWeight: FontWeight.bold)),
                   ),
                   verticalSpace(SizeConfig.blockSizeVertical * 1),
-                  Text("Your favorite, your adventure!",
+                  Text("Your journey, your story!",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: SizeConfig.blockSizeHorizontal * 4,
