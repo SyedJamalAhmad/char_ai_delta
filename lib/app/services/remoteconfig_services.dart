@@ -40,7 +40,7 @@ class RemoteConfigService {
       ));
 
       await remoteConfig.setDefaults(const {
-        "GeminiProKey": "GeminiProKey",
+        "apiKey": "apiKey",
         "extraInstruction": "extraInstruction",
       });
 
@@ -52,10 +52,10 @@ class RemoteConfigService {
   }
 
   Future SetRemoteConfig() async {
-    RCVariables.GeminiAPIKey = remoteConfig.getString('GeminiProKey');
+    RCVariables.apiKey = remoteConfig.getString('apiKey');
     RCVariables.extraInstruction = remoteConfig.getString('extraInstruction');
 
-    initGemini(RCVariables.GeminiAPIKey);
+    initGemini(RCVariables.apiKey);
   }
 
   void initGemini(String geminiAPIKey) {

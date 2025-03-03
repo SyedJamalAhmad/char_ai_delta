@@ -436,7 +436,6 @@ class HomeView extends GetView<HomeViewCTL> {
           controller.adCounter++;
         }
       },
-      
       child: Column(
         children: [
           Container(

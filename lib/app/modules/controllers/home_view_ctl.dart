@@ -1,10 +1,15 @@
 import 'dart:developer' as dp;
 import 'dart:io';
 import 'dart:math';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/data/firebase_categories.dart';
 import 'package:character_ai_delta/app/notificationservice/local_notification_service.dart';
+import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
+import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
+import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:character_ai_delta/app/utills/app_const.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:character_ai_delta/app/utills/gems_rate.dart';
@@ -22,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
@@ -95,6 +101,11 @@ class HomeViewCTL extends GetxController {
       ),
       enableLog: true,
     );
+    bool isFirstLaunch = box.read('first_launch') == "false" ? false : true;
+    dp.log("box.read value ${box.read('first_launch')}");
+    if (isFirstLaunch || kDebugMode) {
+      showOverlay1.value = true;
+    }
 
     assignUniqueId();
     handlePushNotification();
@@ -103,6 +114,96 @@ class HomeViewCTL extends GetxController {
   List<Messages> conversation = [];
   RxBool isWaitingForResponse = false.obs;
   RxList<ChatMessage> chatList = <ChatMessage>[].obs;
+  final box = GetStorage(); // GetStorage for persistent data
+  Rx<bool> showOverlay1 = false.obs;
+  Rx<bool> showOverlay2 = false.obs;
+  final CarouselSliderController carouselController =
+      CarouselSliderController();
+  Rx<FirebaseCharecter> firstCharacter = FirebaseCharecter(
+          title: "none",
+          description: " description",
+          firstMessage: "firstMessage",
+          intro: "intro",
+          category: "category",
+          imageUrl: "imageUrl",
+          historyMessages: "historyMessages")
+      .obs;
+  Rx<int> delayTimer = 15.obs;
+  Rx<bool> isShowOverlay3 = false.obs;
+  Rx<bool> isTransparent = false.obs;
+  Rx<bool> hintButtonPressed = false.obs;
+
+  void dismissOverlay1() {
+    box.write('first_launch', "false"); // Save that guide has been seen
+    dp.log("box.read value after set ${box.read('first_launch')}");
+    showOverlay1.value = false;
+    showOverlay2.value = true;
+    animateSlideEffect();
+  }
+
+  void dismissOverlay2() {
+    showOverlay2.value = false;
+    if (!hintButtonPressed.value) {
+      AIChatModel aiChatModel = AIChatModel(
+          firstCharacter.value.title,
+          [firstCharacter.value.firstMessage],
+          firstCharacter.value.imageUrl,
+          false,
+          firstCharacter.value.description,
+          Routes.GfChatView,
+          mainContainerType.avatar,
+          firstCharacter.value.historyMessages,
+          firstCharacter.value.category);
+
+      String history = firstCharacter.value.historyMessages ?? "";
+      print("Firebase History: $history");
+      openAvatarChat(aiChatModel, firstCharacter.value);
+      if (adCounter == 3) {
+        adCounter = 1;
+        if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
+          MetaAdsProvider.instance.showInterstitialAd();
+        } else {
+          AppLovinProvider.instance.showInterstitial(() {}, false);
+        }
+      } else {
+        adCounter++;
+      }
+    }
+  }
+
+  void animateSlideEffect() async {
+    Rx<bool> isFirstTime = true.obs;
+    while (showOverlay2.value || isShowOverlay3.value) {
+      print(
+          "isFirstTime variable inside animateSlideEffect ${isFirstTime.value}");
+      isFirstTime.value
+          ? await Future.delayed(Duration(milliseconds: 200))
+          : await Future.delayed(Duration(milliseconds: 1080));
+      carouselController.nextPage(
+          duration: Duration(milliseconds: 600), curve: Curves.easeOut);
+      await Future.delayed(Duration(milliseconds: 250));
+      carouselController.previousPage(
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      isFirstTime.value = isFirstTime.value ? false : false;
+    }
+    if (!showOverlay2.value && !hintButtonPressed.value) {
+      carouselController.jumpToPage(0);
+    }
+  }
+
+  animationsInitializer(List<FirebaseCharecter> characters) {
+    // -----------Temp commented untill app is published --Rizwan-------------
+    characters.forEach((character) {
+      if (character.animationUrl != "") {
+        CachedVideoPlayerPlusController.networkUrl(
+            Uri.parse(character.animationUrl!))
+          ..initialize().then((_) {
+            update();
+          });
+      }
+      ;
+    });
+  }
 
   Future promptOfTheDay(String message) async {
     bool result = await InternetConnectionChecker().hasConnection;

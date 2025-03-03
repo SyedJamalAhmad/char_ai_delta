@@ -4,7 +4,8 @@ import 'dart:developer' as developer;
 import 'dart:math';
 
 // import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
+// import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/db_message.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
@@ -197,19 +198,20 @@ class GfChatViewController extends GetxController
 
   RxString mainImage = ''.obs;
   RxBool showVideo = false.obs;
-  late VideoPlayerController videoController;
+  late CachedVideoPlayerPlusController videoController;
   RxBool isVideoControllerInitialized = false.obs;
 
   void initializeVideo(String videoUrl) {
     isVideoControllerInitialized.value = false;
     if (videoUrl.isNotEmpty) {
       showVideo.value = true;
-      videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
-        ..initialize().then((_) {
-          isVideoControllerInitialized.value = true;
-          videoController.play();
-          update();
-        });
+      videoController =
+          CachedVideoPlayerPlusController.networkUrl(Uri.parse(videoUrl))
+            ..initialize().then((_) {
+              isVideoControllerInitialized.value = true;
+              videoController.play();
+              update();
+            });
 
       videoController.addListener(() {
         if (videoController.value.position >= videoController.value.duration) {
@@ -358,51 +360,51 @@ class GfChatViewController extends GetxController
     } else {
       isWaitingForResponse.value = false;
 
-      AwesomeDialog(
-          context: context,
-          dialogBackgroundColor: AppColors.white_color,
-          animType: AnimType.scale,
-          dialogType: DialogType.noHeader,
-          title: '',
-          titleTextStyle: TextStyle(color: AppColors.black_color, fontSize: 20),
-          descTextStyle: TextStyle(color: AppColors.black_color, fontSize: 14),
-          desc: '',
-          // btnOkIcon: Icons.launch,
-          body: Container(
-              child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(SizeConfig.screenWidth * 0.04),
-                // padding: const EdgeInsets.all(8.0),
-                child: Text("Ran out of Gems!", style: StyleSheet.view_heading),
-              ),
-              // SizedBox(height: SizeConfig.screenHeight *0.02,),
-              Padding(
-                padding: EdgeInsets.all(SizeConfig.screenWidth * 0.02),
-                child: Column(
-                  children: [
-                    Text("Your Gems are over!", style: StyleSheet.sub_heading2),
-                    Text("Click OK to get more",
-                        style: StyleSheet.sub_heading2),
-                  ],
-                ),
-              ),
-              // SizedBox(height: SizeConfig.screenHeight *0.02,),
-            ],
-          )),
-          btnOkColor: AppColors.buttonColor,
-          btnCancelColor: AppColors.brightbuttonColor,
-          btnOkText: "OK",
-          btnOkOnPress: () {
-            Get.toNamed(Routes.GemsView);
-            // AppLovinProvider.instance.showRewardedAd(increase_credits);
-            // final service = FlutterBackgroundService();
-            // AllowStepToCount(service);
-          },
-          btnCancelOnPress: () {
-            // onEndIconPress(context);
-          })
-        ..show();
+      // AwesomeDialog(
+      //     context: context,
+      //     dialogBackgroundColor: AppColors.white_color,
+      //     animType: AnimType.scale,
+      //     dialogType: DialogType.noHeader,
+      //     title: '',
+      //     titleTextStyle: TextStyle(color: AppColors.black_color, fontSize: 20),
+      //     descTextStyle: TextStyle(color: AppColors.black_color, fontSize: 14),
+      //     desc: '',
+      //     // btnOkIcon: Icons.launch,
+      //     body: Container(
+      //         child: Column(
+      //       children: [
+      //         Padding(
+      //           padding: EdgeInsets.all(SizeConfig.screenWidth * 0.04),
+      //           // padding: const EdgeInsets.all(8.0),
+      //           child: Text("Ran out of Gems!", style: StyleSheet.view_heading),
+      //         ),
+      //         // SizedBox(height: SizeConfig.screenHeight *0.02,),
+      //         Padding(
+      //           padding: EdgeInsets.all(SizeConfig.screenWidth * 0.02),
+      //           child: Column(
+      //             children: [
+      //               Text("Your Gems are over!", style: StyleSheet.sub_heading2),
+      //               Text("Click OK to get more",
+      //                   style: StyleSheet.sub_heading2),
+      //             ],
+      //           ),
+      //         ),
+      //         // SizedBox(height: SizeConfig.screenHeight *0.02,),
+      //       ],
+      //     )),
+      //     btnOkColor: AppColors.buttonColor,
+      //     btnCancelColor: AppColors.brightbuttonColor,
+      //     btnOkText: "OK",
+      //     btnOkOnPress: () {
+      //       Get.toNamed(Routes.GemsView);
+      //       // AppLovinProvider.instance.showRewardedAd(increase_credits);
+      //       // final service = FlutterBackgroundService();
+      //       // AllowStepToCount(service);
+      //     },
+      //     btnCancelOnPress: () {
+      //       // onEndIconPress(context);
+      //     })
+      //   ..show();
     }
   }
 
@@ -473,47 +475,47 @@ class GfChatViewController extends GetxController
       // navCTL.saveGems(navCTL.gems.value);
       // homectl.decreaseGEMS(GEMS_RATE.NormalChat_GEMS_RATE);
     } else {
-      AwesomeDialog(
-        context: context,
-        dialogBackgroundColor: AppColors.white_color,
-        animType: AnimType.scale,
-        dialogType: DialogType.noHeader,
-        title: 'Please Check your Internet Connection!',
-        titleTextStyle: TextStyle(color: AppColors.black_color, fontSize: 20),
-        descTextStyle: TextStyle(color: AppColors.black_color, fontSize: 14),
-        desc:
-            'The Offline Mode Alert is a feature that notifies users of no internet connection. It helps maintain a smooth user experience by displaying a clear message and providing suggestions for reconnecting.',
-        // btnOkIcon: Icons.launch,
-        body: Container(
-            child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(SizeConfig.screenWidth * 0.04),
-              // padding: const EdgeInsets.all(8.0),
-              child:
-                  Text("Offline Mode Alert!", style: StyleSheet.view_heading),
-            ),
-            // SizedBox(height: SizeConfig.screenHeight *0.02,),
-            Padding(
-              padding: EdgeInsets.all(SizeConfig.screenWidth * 0.02),
-              child: Text(
-                  "Please ensure that you are currently connected to the internet.",
-                  style: StyleSheet.sub_heading2),
-            ),
-            // SizedBox(height: SizeConfig.screenHeight *0.02,),
-          ],
-        )),
-        btnOkColor: AppColors.buttonColor,
-        btnCancelColor: AppColors.brightbuttonColor,
-        btnOkText: "OK",
-        btnOkOnPress: () {
-          // final service = FlutterBackgroundService();
-          // AllowStepToCount(service);
-        },
-        // btnCancelOnPress: () {
-        //   // onEndIconPress(context);
-        // }
-      )..show();
+      // AwesomeDialog(
+      //   context: context,
+      //   dialogBackgroundColor: AppColors.white_color,
+      //   animType: AnimType.scale,
+      //   dialogType: DialogType.noHeader,
+      //   title: 'Please Check your Internet Connection!',
+      //   titleTextStyle: TextStyle(color: AppColors.black_color, fontSize: 20),
+      //   descTextStyle: TextStyle(color: AppColors.black_color, fontSize: 14),
+      //   desc:
+      //       'The Offline Mode Alert is a feature that notifies users of no internet connection. It helps maintain a smooth user experience by displaying a clear message and providing suggestions for reconnecting.',
+      //   // btnOkIcon: Icons.launch,
+      //   body: Container(
+      //       child: Column(
+      //     children: [
+      //       Padding(
+      //         padding: EdgeInsets.all(SizeConfig.screenWidth * 0.04),
+      //         // padding: const EdgeInsets.all(8.0),
+      //         child:
+      //             Text("Offline Mode Alert!", style: StyleSheet.view_heading),
+      //       ),
+      //       // SizedBox(height: SizeConfig.screenHeight *0.02,),
+      //       Padding(
+      //         padding: EdgeInsets.all(SizeConfig.screenWidth * 0.02),
+      //         child: Text(
+      //             "Please ensure that you are currently connected to the internet.",
+      //             style: StyleSheet.sub_heading2),
+      //       ),
+      //       // SizedBox(height: SizeConfig.screenHeight *0.02,),
+      //     ],
+      //   )),
+      //   btnOkColor: AppColors.buttonColor,
+      //   btnCancelColor: AppColors.brightbuttonColor,
+      //   btnOkText: "OK",
+      //   btnOkOnPress: () {
+      //     // final service = FlutterBackgroundService();
+      //     // AllowStepToCount(service);
+      //   },
+      //   // btnCancelOnPress: () {
+      //   //   // onEndIconPress(context);
+      //   // }
+      // )..show();
     }
   }
 
@@ -963,7 +965,7 @@ class GfChatViewController extends GetxController
   }
 
   void initalizeModel(List<Content> history, List<Content> dbHistory) {
-    final apiKey = RCVariables.GeminiAPIKey;
+    final apiKey = RCVariables.apiKey;
     List<Content> actualHistory = [];
     _model = GenerativeModel(
       model: 'gemini-1.5-flash-latest',

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
@@ -46,36 +47,131 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         //       return NewGfChatView(arguments: [aiChatModel, character]);
         //     }).toList(),
         //   ),
-        body: Container(
-      color: Colors.white38,
-      // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
-      child: StreamBuilder<QuerySnapshot>(
-          stream: controller.categoriesStream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text('Error fetching categories'));
-            }
+        body: Stack(
+      children: [
+        Container(
+          color: Colors.white38,
+          // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
+          child: StreamBuilder<QuerySnapshot>(
+              stream: controller.categoriesStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error fetching categories'));
+                }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-            final newCategory =
-                snapshot.data!.docs.where((doc) => doc.id == "New").first;
+                final newCategory =
+                    snapshot.data!.docs.where((doc) => doc.id == "New").first;
 
-            List<FirebaseCatagory> otherCategoriesList = snapshot.data!.docs
-                .map((doc) => FirebaseCatagory.fromJson(
-                    doc.data() as Map<String, dynamic>, doc.id))
-                .toList();
+                List<FirebaseCatagory> otherCategoriesList = snapshot.data!.docs
+                    .map((doc) => FirebaseCatagory.fromJson(
+                        doc.data() as Map<String, dynamic>, doc.id))
+                    .toList();
 
-            otherCategoriesList.sort(((a, b) => a.priority - b.priority));
+                otherCategoriesList.sort(((a, b) => a.priority - b.priority));
 
-            return _allCategoriesViews(otherCategoriesList);
-            //     Expanded(
-            //   child: _allCategoriesViews(otherCategoriesList),
-            // );
-          }),
+                return _allCategoriesViews(otherCategoriesList);
+                //     Expanded(
+                //   child: _allCategoriesViews(otherCategoriesList),
+                // );
+              }),
+        ),
+        Obx(() => controller.showOverlay1.value
+            ? guideWithOverlay(() {
+                controller.dismissOverlay1();
+              }, "assets/animations/tap-animation.gif",
+                controller.isTransparent.value)
+            : Container()),
+        Obx(() => controller.showOverlay2.value
+            ? guideWithOverlay(() {
+                controller.dismissOverlay2();
+              }, "assets/animations/swipe-animation.gif",
+                controller.isTransparent.value)
+            : Container()),
+        Obx(() => controller.isShowOverlay3.value
+            ? tapGuide("assets/animations/tap-animation.gif",
+                controller.isTransparent.value)
+            : Container()),
+      ],
     ));
+  }
+
+  GestureDetector guideWithOverlay(
+      Function onTapFunction, String imagePath, bool isTransparent) {
+    return GestureDetector(
+      onTap: () {
+        onTapFunction();
+      }, // Hide overlay when tapped
+      child: Container(
+        color: isTransparent
+            ? Colors.transparent
+            : Color.fromARGB(191, 0, 0, 0), // Dimmed background
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 5),
+                child: SizedBox(
+                  height: SizeConfig.blockSizeHorizontal * 30,
+                  child: Image.asset(
+                    imagePath,
+                    color: Colors.white,
+                    // filterQuality: FilterQuality.high,
+                    // isAntiAlias: true,
+                  ), // Tap icon ,),
+                ),
+              ),
+            ),
+            isTransparent
+                ? Container()
+                : Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          bottom: SizeConfig.blockSizeVertical * 5),
+                      child: Text("Tap to continue"),
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget tapGuide(String imagePath, bool isTransparent) {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Container(
+            margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 5),
+            child: SizedBox(
+              height: SizeConfig.blockSizeHorizontal * 30,
+              child: Image.asset(
+                imagePath,
+                color: Colors.white,
+                // filterQuality: FilterQuality.high,
+                // isAntiAlias: true,
+              ), // Tap icon ,),
+            ),
+          ),
+        ),
+        isTransparent
+            ? Container()
+            : Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin:
+                      EdgeInsets.only(bottom: SizeConfig.blockSizeVertical * 5),
+                  child: Text("Tap to continue"),
+                ),
+              ),
+      ],
+    );
   }
 
   CarouselSlider _allCategoriesViews(
@@ -85,6 +181,47 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         otherCategoriesList.expand((category) => category.characters).toList();
     listCharacters.shuffle();
     listCharacters.toSet();
+    controller.animationsInitializer(listCharacters);
+    List<String> topCharacters = [
+      "Tesla Musk",
+      "Personal Trainer",
+      "Sex Therapist",
+      "Healthcare Assistant",
+      "Psychologist",
+      "Swimming coach",
+      "Nina"
+    ];
+    // Tom Cruise
+    // Teacher
+    // Nina
+    // Gojo
+    // Elias Mercer
+    // Jung Kook
+    List<FirebaseCharecter> matchingCharacters = [];
+    late FirebaseCharecter firstCharacter;
+    late int firstCharacterIndex;
+
+    listCharacters.removeWhere((character) {
+      if (topCharacters.contains(character.title)) {
+        matchingCharacters.add(character);
+        return true; // Remove from the original list
+      }
+      return false;
+    });
+
+    matchingCharacters.asMap().forEach((index, character) {
+      if (character.title == "Nina") {
+        firstCharacter = character;
+        firstCharacterIndex = index;
+      }
+    });
+
+    matchingCharacters.removeAt(firstCharacterIndex);
+    matchingCharacters.insert(0, firstCharacter);
+
+    // Insert the matching characters at the beginning
+    listCharacters.insertAll(0, matchingCharacters);
+    controller.firstCharacter.value = listCharacters[0];
 
     print("All Characters ${listCharacters} ${otherCategoriesList}");
     return CarouselSlider.builder(
@@ -99,10 +236,13 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         // autoPlay: true,
         // aspectRatio: 16 / 9,
         autoPlayCurve: Curves.fastOutSlowIn,
-        // enableInfiniteScroll: true,
-        // autoPlayAnimationDuration: Duration(milliseconds: 800),
+        enableInfiniteScroll: true,
+        // autoPlayInterval: Duration(seconds: 6),
+        // enlargeFactor: 1,
+        autoPlayAnimationDuration: Duration(milliseconds: 1000),
         viewportFraction: 1,
       ),
+      carouselController: controller.carouselController,
     );
   }
   //[FirebaseCategory[firebase character][firebase character][firebase character]]
@@ -125,7 +265,6 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         String history = character.historyMessages ?? "";
         print("Firebase History: $history");
         controller.openAvatarChat(aiChatModel, character);
-
         if (controller.adCounter == 3) {
           controller.adCounter = 1;
           if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
@@ -138,6 +277,24 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         }
       },
       child: Stack(children: [
+        // Container(
+        //     width: double.infinity,
+        //     height: double.infinity,
+        //     child: controller.showVideo.value
+        //         ? controller.isVideoControllerInitialized.value
+        //             ? AspectRatio(
+        //                 aspectRatio:
+        //                     controller.videoController.value.aspectRatio,
+        //                 child:
+        //                     CachedVideoPlayerPlus(controller.videoController),
+        //               )
+        //             : Center()
+        //         : Container()),
+        // Obx(() => Container(
+        //       width: SizeConfig.screenWidth,
+        //       height: SizeConfig.screenHeight,
+        //       child: CachedNetworkImage(imageUrl: controller.main_image.value),
+        //     )),
         Container(
           width: SizeConfig.screenWidth,
           height: SizeConfig.screenHeight,
@@ -155,8 +312,8 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
           ),
         ),
         Container(
-          color: Colors.black38,
-          height: SizeConfig.blockSizeVertical * 13,
+          color: const Color.fromARGB(21, 0, 0, 0),
+          height: SizeConfig.blockSizeVertical * 12,
           width: SizeConfig.screenWidth,
         ),
         Container(
@@ -171,21 +328,41 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
               //     ?
               Flexible(
                 flex: 1,
-                child: Text(
-                  character.title,
-                  style: TextStyle(
-                    color: Color(0xFFFFFFFF), // #FFF in hexadecimal
-                    fontFamily:
-                        'Iceland', // make sure to add the font file to your project
-                    fontSize: 25.0, // in logical pixels
-                    fontStyle: FontStyle.normal,
-                    fontWeight: FontWeight.bold,
-                    // w400, // normal weight
-                    height: 1.0, // normal line height
+                child: Container(
+                  // padding:
+                  //     EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
+                  child: Text(
+                    character.title,
+                    style: TextStyle(
+                      color: Color(0xFFFFFFFF), // #FFF in hexadecimal
+                      fontFamily:
+                          'Iceland', // make sure to add the font file to your project
+                      fontSize: 25.0, // in logical pixels
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.bold,
+                      // w400, // normal weight
+                      height: 1.0, // normal line height
+                    ),
                   ),
                 ),
               ),
               horizontalSpace(SizeConfig.blockSizeHorizontal),
+              GestureDetector(
+                onTap: () {
+                  controller.showOverlay1.value = true;
+                  controller.hintButtonPressed.value = true;
+                },
+                child: Container(
+                    padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      Icons.question_mark_outlined,
+                      color: Colors.black,
+                    )),
+              )
 // [[[[[[[[[[[[[[[[[Commented by Jammal Temp]]]]]]]]]]]]]]]]]
               // Platform.isIOS
               //     ? Container()
