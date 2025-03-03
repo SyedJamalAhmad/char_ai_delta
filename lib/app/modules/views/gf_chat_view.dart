@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/services/revenuecat_service.dart';
@@ -54,34 +55,43 @@ class GfChatView extends GetView<GfChatViewController> {
           backgroundColor: AppColors.ScaffoldColor,
           body: Obx(
             () => Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image:
-                      CachedNetworkImageProvider(controller.main_image.value),
-                  fit: BoxFit.cover,
-                ),
-              ),
+              // decoration: BoxDecoration(
+              //   image: DecorationImage(
+              //     image:
+              //         CachedNetworkImageProvider(controller.main_image.value),
+              //     fit: BoxFit.cover,
+              //   ),
+              // ),
               child: Stack(
                 children: [
                   Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: controller.showVideo.value
-                          ? controller.isVideoControllerInitialized.value
-                              ? AspectRatio(
-                                  aspectRatio: controller
-                                      .videoController.value.aspectRatio,
-                                  child:
-                                      VideoPlayer(controller.videoController),
-                                )
-                              : Center()
-                          : Container()),
-                  // Obx(() => Container(
-                  //       width: SizeConfig.screenWidth,
-                  //       height: SizeConfig.screenHeight,
-                  //       child: CachedNetworkImage(
-                  //           imageUrl: controller.main_image.value),
-                  //     )),
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: controller.showVideo.value
+                        ? controller.isVideoControllerInitialized.value
+                            ? FittedBox(
+                                fit: BoxFit
+                                    .cover, // Stretches beyond the screen width
+                                child: SizedBox(
+                                  width: controller
+                                      .videoController.value.size.width,
+                                  height: controller
+                                      .videoController.value.size.height,
+                                  child: CachedVideoPlayerPlus(
+                                      controller.videoController),
+                                ),
+                              )
+                            : Center()
+                        : Obx(() => Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: CachedNetworkImageProvider(
+                                      controller.main_image.value),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            )),
+                  ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                         0, SizeConfig.screenHeight * 0.04, 0, 0),

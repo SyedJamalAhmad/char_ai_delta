@@ -14,12 +14,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   // Gemini.init(
   //     apiKey: 'AIzaSyCwMNpCEgkX_bxpq_hcxFa1CuN3fPZfk7o', enableDebugging: true);
-
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
