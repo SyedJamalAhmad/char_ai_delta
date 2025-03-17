@@ -49,7 +49,7 @@ dependencies:
   image_picker: ^1.1.2
   flutter_easyloading: ^3.0.5
   fluttertoast: ^8.2.8
-  purchases_flutter: ^6.0.0
+  purchases_flutter: ^8.6.1
 
   # google_mlkit_text_recognition: ^0.9.0
   # speech_to_text: ^6.3.0

@@ -966,9 +966,10 @@ class GfChatViewController extends GetxController
 
   void initalizeModel(List<Content> history, List<Content> dbHistory) {
     final apiKey = RCVariables.apiKey;
+    final modelName = RCVariables.geminiModel;
     List<Content> actualHistory = [];
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
+      model: modelName,
       apiKey: apiKey,
     );
 
