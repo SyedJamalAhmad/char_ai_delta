@@ -243,7 +243,7 @@ class GfChatViewController extends GetxController
 
   Future playTextMessageSpeech(String message) async {
     developer.log("${await flutterTts.getVoices}");
-    flutterTts.setVoice({"name": "es-us-x-sfb-local", "locale": "es-US"});
+    // flutterTts.setVoice({"name": "es-us-x-sfb-local", "locale": "es-US"});
     var result = await flutterTts.speak(message);
   }
 
