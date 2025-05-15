@@ -1,0 +1,2 @@
+C:/Rizwan_laptop/Izzatech/char_ai_delta/android/app/.cxx/RelWithDebInfo/2t6c2ho2/x86/CMakeFiles/edit_cache.dir
+C:/Rizwan_laptop/Izzatech/char_ai_delta/android/app/.cxx/RelWithDebInfo/2t6c2ho2/x86/CMakeFiles/rebuild_cache.dir

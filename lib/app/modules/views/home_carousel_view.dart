@@ -19,6 +19,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:glass/glass.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class HomeCarouselView extends GetView<HomeViewCTL> {
@@ -29,6 +31,25 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
     Provider.of<ConnectionProvider>(context, listen: false)
         .setIgnoreConnectionCheck(false);
     return Scaffold(
+        floatingActionButton: Obx(() =>
+            controller.showOverlay1.value || controller.showOverlay2.value
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color.fromARGB(82, 0, 0, 0)),
+                    child: IconButton(
+                        // highlightColor: Colors.amber,
+                        color: Colors.white,
+                        onPressed: () {
+                          controller.showOverlay1.value = true;
+                          controller.hintButtonPressed.value = true;
+                        },
+                        icon: Icon(Icons.question_mark_outlined)),
+                  ).asGlass(
+                    blurX: 4,
+                    blurY: 4,
+                    clipBorderRadius: BorderRadius.circular(30))),
         // appBar: AppBar(
         // title: Text('Chat Views'),
         // bottom: TabBar(
@@ -48,55 +69,58 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         //     }).toList(),
         //   ),
         body: Stack(
-      children: [
-        Container(
-          color: Colors.white38,
-          // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
-          child: StreamBuilder<QuerySnapshot>(
-              stream: controller.categoriesStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error fetching categories'));
-                }
+          children: [
+            Container(
+              color: Colors.white38,
+              // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
+              child: StreamBuilder<QuerySnapshot>(
+                  stream: controller.categoriesStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error fetching categories'));
+                    }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-                final newCategory =
-                    snapshot.data!.docs.where((doc) => doc.id == "New").first;
+                    final newCategory = snapshot.data!.docs
+                        .where((doc) => doc.id == "New")
+                        .first;
 
-                List<FirebaseCatagory> otherCategoriesList = snapshot.data!.docs
-                    .map((doc) => FirebaseCatagory.fromJson(
-                        doc.data() as Map<String, dynamic>, doc.id))
-                    .toList();
+                    List<FirebaseCatagory> otherCategoriesList = snapshot
+                        .data!.docs
+                        .map((doc) => FirebaseCatagory.fromJson(
+                            doc.data() as Map<String, dynamic>, doc.id))
+                        .toList();
 
-                otherCategoriesList.sort(((a, b) => a.priority - b.priority));
+                    otherCategoriesList
+                        .sort(((a, b) => a.priority - b.priority));
 
-                return _allCategoriesViews(otherCategoriesList);
-                //     Expanded(
-                //   child: _allCategoriesViews(otherCategoriesList),
-                // );
-              }),
-        ),
-        Obx(() => controller.showOverlay1.value
-            ? guideWithOverlay(() {
-                controller.dismissOverlay1();
-              }, "assets/animations/tap-animation.gif",
-                controller.isTransparent.value)
-            : Container()),
-        Obx(() => controller.showOverlay2.value
-            ? guideWithOverlay(() {
-                controller.dismissOverlay2();
-              }, "assets/animations/swipe-animation.gif",
-                controller.isTransparent.value)
-            : Container()),
-        Obx(() => controller.isShowOverlay3.value
-            ? tapGuide("assets/animations/tap-animation.gif",
-                controller.isTransparent.value)
-            : Container()),
-      ],
-    ));
+                    return _allCategoriesViews(otherCategoriesList);
+                    //     Expanded(
+                    //   child: _allCategoriesViews(otherCategoriesList),
+                    // );
+                  }),
+            ),
+            Obx(() => controller.showOverlay1.value
+                ? guideWithOverlay(() {
+                    controller.dismissOverlay1();
+                  }, "assets/animations/tap-animation.gif",
+                    controller.isTransparent.value)
+                : Container()),
+            Obx(() => controller.showOverlay2.value
+                ? guideWithOverlay(() {
+                    controller.dismissOverlay2();
+                  }, "assets/animations/swipe-animation.gif",
+                    controller.isTransparent.value)
+                : Container()),
+            Obx(() => controller.isShowOverlay3.value
+                ? tapGuide("assets/animations/tap-animation.gif",
+                    controller.isTransparent.value)
+                : Container()),
+          ],
+        ));
   }
 
   GestureDetector guideWithOverlay(
@@ -312,107 +336,64 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
           ),
         ),
         Container(
-          color: const Color.fromARGB(21, 0, 0, 0),
+          color: const Color.fromARGB(59, 0, 0, 0),
           height: SizeConfig.blockSizeVertical * 12,
           width: SizeConfig.screenWidth,
+        ).asGlass(blurX: 4, blurY: 4),
+        Container(
+          padding: EdgeInsets.only(
+              bottom: SizeConfig.blockSizeVertical * 12,
+              right: SizeConfig.blockSizeHorizontal * 10,
+              left: SizeConfig.blockSizeHorizontal * 4),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              padding: EdgeInsets.only(
+                  bottom: SizeConfig.blockSizeVertical * 2.5,
+                  top: SizeConfig.blockSizeVertical * 2,
+                  right: SizeConfig.blockSizeHorizontal * 4,
+                  left: SizeConfig.blockSizeHorizontal * 4),
+              // width: SizeConfig.screenWidth * 0.9,
+              // height: SizeConfig.blockSizeVertical * 20,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(26, 96, 125, 139),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Text("${character.firstMessage}",
+                  style: GoogleFonts.barlowSemiCondensed(
+                    textStyle: TextStyle(height: 1.7),
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  )),
+            ).asGlass(
+              blurX: 8,
+              blurY: 5,
+              clipBorderRadius: BorderRadius.circular(25),
+            ),
+          ),
         ),
         Container(
           padding: EdgeInsets.only(
               top: SizeConfig.blockSizeVertical * 5,
               right: SizeConfig.blockSizeHorizontal * 5,
               left: SizeConfig.blockSizeHorizontal * 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Platform.isAndroid || Platform.isIOS
-              //     ?
-              Flexible(
-                flex: 1,
-                child: Container(
-                  // padding:
-                  //     EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
-                  child: Text(
-                    character.title,
-                    style: TextStyle(
-                      color: Color(0xFFFFFFFF), // #FFF in hexadecimal
-                      fontFamily:
-                          'Iceland', // make sure to add the font file to your project
-                      fontSize: 25.0, // in logical pixels
-                      fontStyle: FontStyle.normal,
-                      fontWeight: FontWeight.bold,
-                      // w400, // normal weight
-                      height: 1.0, // normal line height
-                    ),
-                  ),
-                ),
+          child: Container(
+            // padding:
+            //     EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
+            child: Text(
+              character.title,
+              style: TextStyle(
+                color: Color(0xFFFFFFFF), // #FFF in hexadecimal
+                fontFamily:
+                    'Iceland', // make sure to add the font file to your project
+                fontSize: 25.0, // in logical pixels
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.bold,
+                // w400, // normal weight
+                height: 1.0, // normal line height
               ),
-              horizontalSpace(SizeConfig.blockSizeHorizontal),
-              GestureDetector(
-                onTap: () {
-                  controller.showOverlay1.value = true;
-                  controller.hintButtonPressed.value = true;
-                },
-                child: Container(
-                    padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Icon(
-                      Icons.question_mark_outlined,
-                      color: Colors.black,
-                    )),
-              )
-// [[[[[[[[[[[[[[[[[Commented by Jammal Temp]]]]]]]]]]]]]]]]]
-              // Platform.isIOS
-              //     ? Container()
-              //     : Row(
-              //         mainAxisAlignment: MainAxisAlignment.start,
-              //         children: [
-              //           GestureDetector(
-              //             onTap: () {
-              //               Get.toNamed(Routes.GemsView);
-              //             },
-              //             child: Container(
-              //               decoration: BoxDecoration(
-              //                 color: AppColors.bottomNavColor,
-              //                 border:
-              //                     Border.all(color: Colors.white, width: 0.3),
-              //                 borderRadius: BorderRadius.circular(8.0),
-              //               ),
-              //               child: Padding(
-              //                 padding: const EdgeInsets.all(10.0),
-              //                 child: Row(
-              //                   mainAxisAlignment: MainAxisAlignment.center,
-              //                   children: [
-              //                     SizedBox(
-              //                       height: SizeConfig.screenHeight * 0.03,
-              //                     ),
-              //                     Row(
-              //                       children: [
-              //                         Image.asset(
-              //                           AppImages.gems,
-              //                           scale: 30,
-              //                         ),
-              //                         Obx(
-              //                           () => Text(
-              //                             " ${controller.gems.value}",
-              //                             style: StyleSheet.Intro_Sub_heading2,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           width: SizeConfig.screenWidth * 0.01,
-              //                         )
-              //                       ],
-              //                     )
-              //                   ],
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-            ],
+            ),
           ),
         ),
       ]),

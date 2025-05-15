@@ -444,7 +444,7 @@ class HomeView extends GetView<HomeViewCTL> {
             child: Stack(
               children: [
                 Hero(
-                  tag: character.title,
+                  tag: "character.title",
                   child: Container(
                     margin: EdgeInsets.only(
                         right: SizeConfig.blockSizeHorizontal * 3),

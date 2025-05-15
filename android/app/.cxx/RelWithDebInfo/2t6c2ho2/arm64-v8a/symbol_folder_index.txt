@@ -1,0 +1,1 @@
+C:\Rizwan_laptop\Izzatech\char_ai_delta\build\app\intermediates\cxx\RelWithDebInfo\2t6c2ho2\obj\arm64-v8a

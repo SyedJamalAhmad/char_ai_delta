@@ -25,17 +25,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:glass/glass.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 // import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 // import 'package:google_ml_kit/google_ml_kit.dart';
 
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:video_player/video_player.dart';
 
 // import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -147,6 +153,10 @@ class GfChatViewController extends GetxController
       <({Image? image, String? text, bool fromUser})>[];
   bool _loading = false;
 
+  RxBool isRecording = false.obs;
+  Rx<Color> recordButtonColor = Colors.lightBlueAccent.obs;
+  RxBool isRecordingCanceled = false.obs;
+
   @override
   void onReady() {
     // TODO: implement onReady
@@ -158,6 +168,11 @@ class GfChatViewController extends GetxController
     // TODO: implement onClose
     // animationController.dispose();
     // typingAnimation!.dispose();
+    textEditingController.dispose();
+    speechToText.stop();
+    speechToText.cancel();
+    recordedString.value = '';
+
     typingAnimation!.removeListener(() {});
     animationController.dispose();
     textFieldFocusNode.dispose();
@@ -183,12 +198,6 @@ class GfChatViewController extends GetxController
 
   RxBool showScannedText = false.obs;
 
-  RxString lastWords = ''.obs;
-  final TextEditingController _pauseForController =
-      TextEditingController(text: '3');
-  final TextEditingController _listenForController =
-      TextEditingController(text: '30');
-  bool _onDevice = false;
   double minSoundLevel = 50000;
   double maxSoundLevel = -50000;
   double level = 0.0;
@@ -200,6 +209,13 @@ class GfChatViewController extends GetxController
   RxBool showVideo = false.obs;
   late CachedVideoPlayerPlusController videoController;
   RxBool isVideoControllerInitialized = false.obs;
+
+  SpeechToText speechToText = SpeechToText();
+  bool speechEnabled = false;
+  String speechText = '';
+  RxString recordedString = ''.obs;
+  late BuildContext inputFieldContext;
+  FlutterTts flutterTts = FlutterTts();
 
   void initializeVideo(String videoUrl) {
     isVideoControllerInitialized.value = false;
@@ -225,10 +241,194 @@ class GfChatViewController extends GetxController
     }
   }
 
+  Future playTextMessageSpeech(String message) async {
+    developer.log("${await flutterTts.getVoices}");
+    flutterTts.setVoice({"name": "es-us-x-sfb-local", "locale": "es-US"});
+    var result = await flutterTts.speak(message);
+  }
+
+  Future stopTextMessageSpeech(String message) async {
+    var result = await flutterTts.stop();
+  }
+
+  /// Request permissions and initialize SpeechToText
+  Future<void> _checkPermissionsAndInitialize() async {
+    PermissionStatus micPermission = await Permission.microphone.request();
+
+    if (micPermission.isGranted) {
+      try {
+        speechEnabled = await speechToText.initialize(
+          finalTimeout: Duration(hours: 1),
+          onStatus: _onStatus,
+          onError: _onError,
+        );
+
+        print('Speech initialized: ${speechEnabled}');
+      } catch (e) {
+        print('Error initializing SpeechToText: $e');
+        speechEnabled = false;
+      }
+    } else {
+      print('Microphone permission not granted');
+      speechEnabled = false;
+    }
+  }
+
+  /// Each time to start a speech recognition session
+  void startListening() async {
+    if (speechToText.isAvailable) {
+      recordButtonColor.value = Colors.deepOrangeAccent;
+
+      await speechToText.listen(
+          onResult: _onSpeechResult,
+          listenFor: Duration(seconds: 30),
+          pauseFor: Duration(seconds: 10));
+      developer.log("Listening...");
+    }
+    if (await Permission.microphone.isPermanentlyDenied) {
+      Get.dialog(
+        Center(
+          child: Container(
+            width: SizeConfig.screenWidth * 0.8,
+            height: SizeConfig.screenHeight * 0.25,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: const Color.fromARGB(146, 96, 125, 139),
+            ),
+            child: Column(
+              children: [
+                Center(
+                  child: Icon(
+                    Icons.mic_off,
+                    size: SizeConfig.blockSizeHorizontal * 10,
+                  ),
+                ),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 1,
+                ),
+                Text(
+                    "Grant microphone permission to gain access to this feature",
+                    textAlign: TextAlign.center,
+                    style: StyleSheet.sub_heading2),
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 2,
+                ),
+                Text("Go to Settings > App > Permissions",
+                    textAlign: TextAlign.center,
+                    style: StyleSheet.sub_heading2),
+              ],
+            ),
+          ).asGlass(
+              clipBorderRadius: BorderRadius.circular(15),
+              blurX: 15,
+              blurY: 15),
+        ),
+      );
+    }
+    if (await Permission.microphone.isDenied) {
+      developer.log("Speech recognition not available");
+      recordButtonColor.value = Colors.lightBlueAccent;
+      Get.dialog(
+        Center(
+          child: Container(
+            width: SizeConfig.screenWidth * 0.8,
+            height: SizeConfig.screenHeight * 0.25,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: const Color.fromARGB(52, 96, 125, 139),
+            ),
+            child: Column(
+              children: [
+                Center(
+                  child: Icon(
+                    Icons.mic_rounded,
+                    size: SizeConfig.blockSizeHorizontal * 10,
+                  ),
+                ),
+                Text(
+                    "Grant microphone permission to gain access to this feature",
+                    textAlign: TextAlign.center,
+                    style: StyleSheet.sub_heading2),
+                Expanded(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      alignment: Alignment.bottomRight,
+                      child: SizedBox(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.lightBlueAccent,
+                          ),
+                          child: TextButton.icon(
+                            // style: ButtonStyle(backgroundColor: ),
+                            onPressed: () async {
+                              await Permission.microphone.request();
+                            },
+                            icon: Icon(Icons.mic),
+                            label: Text("Allow Microphone"),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ))
+              ],
+            ),
+          ).asGlass(clipBorderRadius: BorderRadius.circular(15)),
+        ),
+      );
+    } else {}
+  }
+
+  void _onStatus(String status) async {
+    lastStatus.value = status;
+    if (status == "done") {
+      recordButtonColor.value = Colors.lightBlueAccent;
+
+      developer.log("Done Listening");
+    }
+
+    developer.log('Status: $status');
+  }
+
+  void _onError(SpeechRecognitionError error) {
+    recordButtonColor.value = Colors.lightBlueAccent;
+    // lastError.value = '${error.errorMsg} - ${error.permanent}';
+    developer.log('Error: ${error.errorMsg}');
+  }
+
+  void stopListening() async {
+    recordButtonColor.value = Colors.lightBlueAccent;
+    await speechToText.stop();
+    developer.log("Stopped Listening");
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) async {
+    if (result.finalResult) {
+      recordedString.value = result.recognizedWords;
+      developer.log(
+          "textController ${textEditingController.text} | recordedString  ${recordedString.value}");
+      await sendMessageButton();
+
+      developer.log("Result: ${result.recognizedWords}");
+    } else {
+      textEditingController.text = result.recognizedWords;
+      developer.log("Partial Result: ${result.recognizedWords}");
+    }
+  }
+
   @override
   Future<void> onInit() async {
     final argument = Get.arguments;
     print("argument: $argument");
+    await _checkPermissionsAndInitialize();
+    await flutterTts.awaitSpeakCompletion(false);
+
+    recordedString.value = "";
 
     if (argument != null && argument[0] is AIChatModel) {
       AIChatModel aiChatModel = argument[0];
@@ -344,6 +544,21 @@ class GfChatViewController extends GetxController
   }
 
   List<Messages> conversation = [];
+
+  Future<void> sendMessageButton() async {
+    print("Send Message ${textEditingController.text}");
+    if (!wait.value) {
+      if (textEditingController.text.isNotEmpty) {
+        isWaitingForResponse.value = true;
+        // ? Commented by jamal start
+        sendMessage("${textEditingController.text}", inputFieldContext);
+        //// ? Commented by jamal end
+        lastMessage.value = textEditingController.text;
+        textEditingController.clear();
+      }
+    }
+  }
+
 // ? Commented by jamal start
   Future sendMessage(String message, context) async {
     lastMessage.value = message;
@@ -963,6 +1178,8 @@ class GfChatViewController extends GetxController
       return maps;
     }
   }
+
+  // void initSpeec
 
   void initalizeModel(List<Content> history, List<Content> dbHistory) {
     final apiKey = RCVariables.apiKey;

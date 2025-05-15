@@ -91,6 +91,11 @@ dependencies:
   flutter_animate: ^4.5.2
   cached_video_player_plus: ^3.0.3
   get_storage: ^2.1.1  
+  speech_to_text: ^7.0.0
+  permission_handler: ^11.4.0
+  glass: ^2.0.0+2
+  flutter_tts: ^4.2.2
+
 
 dev_dependencies:
   flutter_test:

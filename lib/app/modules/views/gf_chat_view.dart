@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:glass/glass.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -340,19 +342,21 @@ class GfChatView extends GetView<GfChatViewController> {
             verticalSpace(SizeConfig.blockSizeVertical)
           ],
         ),
-      ),
+      ).asGlass(),
     );
   }
 
   Widget _InputField(BuildContext context) {
+    controller.inputFieldContext = context;
     return Container(
+      padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.5),
       decoration: BoxDecoration(
-        color: Color(0xFF0D0D0D),
-        border: Border.all(
-          color: Color.fromARGB(255, 43, 42, 42), // Set the border color here
-          width: 1.0, // Set the border width here
+        color: Color.fromARGB(215, 13, 13, 13),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(20.0),
+        // color: Colors.red,
       ),
 
       // ),
@@ -360,7 +364,7 @@ class GfChatView extends GetView<GfChatViewController> {
         // color: Colors.red,
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: SizeConfig.blockSizeHorizontal * 3,
+              horizontal: SizeConfig.blockSizeHorizontal * 2,
               vertical: SizeConfig.blockSizeVertical * 0.5),
           child: Column(
             children: [
@@ -389,39 +393,76 @@ class GfChatView extends GetView<GfChatViewController> {
                         // hintMaxLines: 10,
                         hintText: "Write Your Message here...",
                         hintStyle: TextStyle(color: Colors.grey),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeVertical * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 2),
 
                         border: InputBorder.none, // Remove the border
                         counterStyle: TextStyle(color: Colors.white),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            print(
-                                "Send Message ${controller.textEditingController.text}");
-                            if (!controller.wait.value) {
-                              if (controller
-                                  .textEditingController.text.isNotEmpty) {
-                                controller.isWaitingForResponse.value = true;
-                                // ? Commented by jamal start
-                                controller.sendMessage(
-                                    "${controller.textEditingController.text}",
-                                    context);
-                                //// ? Commented by jamal end
-                                controller.lastMessage.value =
-                                    controller.textEditingController.text;
-                                controller.textEditingController.clear();
-                              }
-                            }
-                          },
-                          icon: Icon(
-                            Icons.send,
-                            color: Color(0xEEF37B38),
-                            // Color(
-                            //     0xFF25D366)
-                          ), // WhatsApp send button icon
-                        )
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              // onLongPressCancel: () {
+                              //   controller.recordButtonHandler(
+                              //       Colors.red, false,
+                              //       isRecordingCanceled: true);
+                              //   developer.log("long press cancel ");
+                              // },
+                              onLongPress: () {
+                                // controller.recordButtonHandler(
+                                //     Colors.deepOrangeAccent, true);
+                                controller.startListening();
+
+                                developer.log("long press start ");
+                              },
+                              onLongPressUp: () {
+                                // controller.recordButtonHandler(
+                                //     Colors.lightBlueAccent, false);
+                                controller.stopListening();
+
+                                developer.log("long press end ");
+                              },
+                              // onLongPressEnd: (_) {
+                              //   controller.recordButtonHandler(
+                              //       Colors.lightBlueAccent, false);
+                              //   developer.log("long press end $_");
+                              // },
+                              child: Obx(() => AnimatedScale(
+                                    scale: controller.recordButtonColor.value ==
+                                            Colors.deepOrangeAccent
+                                        ? 1.15
+                                        : 1,
+                                    duration: Duration(seconds: 1),
+                                    child: Container(
+                                        padding: EdgeInsets.all(8),
+                                        margin:
+                                            EdgeInsets.symmetric(horizontal: 4),
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: controller
+                                                .recordButtonColor.value),
+                                        child: Icon(Icons.mic)),
+                                  )),
+                            ),
+                            Container(
+                              child: IconButton(
+                                onPressed: () async {
+                                  await controller.sendMessageButton();
+                                },
+                                icon: Icon(
+                                  Icons.send,
+                                  color: Color(0xEEF37B38),
+                                  // Color(
+                                  //     0xFF25D366)
+                                ), // WhatsApp send button icon
+                              ),
+                            ),
+                          ],
+                        ),
                         // :
                         // Container()
-
-                        ,
                       ),
                     ),
                   ),
@@ -431,7 +472,7 @@ class GfChatView extends GetView<GfChatViewController> {
           ),
         ),
       ),
-    );
+    ).asGlass();
   }
 
   Container _MessageBubble(
@@ -451,37 +492,63 @@ class GfChatView extends GetView<GfChatViewController> {
             //? Avatar image for Bot
             if (!isSender) ...[
               controller.main_image.value.contains("assets")
-                  ? Container(
-                      height: SizeConfig.blockSizeHorizontal * 10,
-                      width: SizeConfig.blockSizeHorizontal * 10,
-                      // margin: EdgeInsets.only(
-                      //     top: SizeConfig.blockSizeVertical * 10
-                      //     ),
-                      decoration: BoxDecoration(
-                        // Apply border radius to the container itself
-                        borderRadius: BorderRadius.circular(
-                            SizeConfig.blockSizeHorizontal *
-                                5), // Make it a perfect circle
-                        image: DecorationImage(
-                          fit: BoxFit.cover, // Fill the entire container
-                          image: AssetImage(controller.main_image.value),
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: SizeConfig.blockSizeHorizontal * 10,
+                          width: SizeConfig.blockSizeHorizontal * 10,
+                          decoration: BoxDecoration(
+                            // Apply border radius to the container itself
+                            borderRadius: BorderRadius.circular(
+                                SizeConfig.blockSizeHorizontal *
+                                    5), // Make it a perfect circle
+                            image: DecorationImage(
+                              fit: BoxFit.cover, // Fill the entire container
+                              image: AssetImage(controller.main_image.value),
+                            ),
+                          ),
                         ),
-                      ),
+                        Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.black38),
+                            child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.play_arrow_rounded)))
+                      ],
                     )
-                  : Container(
-                      height: SizeConfig.blockSizeHorizontal * 10,
-                      width: SizeConfig.blockSizeHorizontal * 10,
-                      decoration: BoxDecoration(
-                        // Apply border radius to the container itself
-                        borderRadius: BorderRadius.circular(
-                            SizeConfig.blockSizeHorizontal *
-                                5), // Make it a perfect circle
-                        image: DecorationImage(
-                          fit: BoxFit.cover, // Fill the entire container
-                          image: CachedNetworkImageProvider(
-                              controller.main_image.value),
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: SizeConfig.blockSizeHorizontal * 10,
+                          width: SizeConfig.blockSizeHorizontal * 10,
+                          decoration: BoxDecoration(
+                            // Apply border radius to the container itself
+                            borderRadius: BorderRadius.circular(
+                                SizeConfig.blockSizeHorizontal *
+                                    5), // Make it a perfect circle
+                            image: DecorationImage(
+                              fit: BoxFit.cover, // Fill the entire container
+                              image: CachedNetworkImageProvider(
+                                  controller.main_image.value),
+                            ),
+                          ),
                         ),
-                      ),
+                        Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.black38),
+                            child: IconButton(
+                                onPressed: () {
+                                  developer.log(
+                                      "message ${controller.chatList[index].message}");
+                                  developer
+                                      .log("${controller.gender_male.value}");
+                                  controller.playTextMessageSpeech(
+                                      controller.chatList[index].message);
+                                },
+                                icon: Icon(Icons.play_arrow_rounded)))
+                      ],
                     )
               // Icon(
               //   CupertinoIcons.rocket,
@@ -494,7 +561,7 @@ class GfChatView extends GetView<GfChatViewController> {
                   ? message.length <= 30
                       ? CrossAxisAlignment.end
                       : CrossAxisAlignment.start
-                  : CrossAxisAlignment.end,
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
                   width: message.length <= 30
@@ -504,22 +571,26 @@ class GfChatView extends GetView<GfChatViewController> {
                       vertical: SizeConfig.blockSizeVertical * 0.5,
                       horizontal: SizeConfig.blockSizeHorizontal * 1),
                   decoration: BoxDecoration(
-                    gradient: !isSender
-                        ? LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                                Color.fromARGB(255, 43, 42, 42),
-                                Color(0xFF0D0D0D),
-                              ])
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                                //? User Gradiant
-                                Color.fromARGB(255, 41, 40, 40),
-                                Color.fromARGB(255, 85, 85, 85),
-                              ]),
+                    color: isSender
+                        ? Colors.lightBlue
+                        : const Color.fromARGB(255, 41, 63, 75),
+                    // gradient: !isSender
+                    //     ?
+                    //     LinearGradient(
+                    //         begin: Alignment.topLeft,
+                    //         end: Alignment.bottomRight,
+                    //         colors: [
+                    //             Color.fromARGB(255, 43, 42, 42),
+                    //             Color(0xFF0D0D0D),
+                    //           ])
+                    //     : LinearGradient(
+                    //         begin: Alignment.topLeft,
+                    //         end: Alignment.bottomRight,
+                    //         colors: [
+                    //             //? User Gradiant
+                    //             Color.fromARGB(255, 41, 40, 40),
+                    //             Color.fromARGB(255, 85, 85, 85),
+                    //           ]),
                     // color: isSender
                     //     ? null
                     //     : Color
@@ -529,9 +600,14 @@ class GfChatView extends GetView<GfChatViewController> {
                     //             33,
                     //             33),
                     borderRadius: BorderRadius.circular(
-                        SizeConfig.blockSizeHorizontal * 4),
+                        SizeConfig.blockSizeHorizontal * 6),
                   ),
-                  padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 5),
+                  padding: EdgeInsets.only(
+                    right: SizeConfig.blockSizeHorizontal * 4,
+                    left: SizeConfig.blockSizeHorizontal * 4,
+                    top: SizeConfig.blockSizeVertical * 2,
+                    bottom: SizeConfig.blockSizeVertical * 2,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -651,7 +727,7 @@ class GfChatView extends GetView<GfChatViewController> {
               Icon(
                 CupertinoIcons.person_crop_circle,
                 size: SizeConfig.blockSizeHorizontal * 10,
-                color: Color.fromARGB(255, 41, 40, 40),
+                color: Color.fromARGB(255, 137, 137, 137),
               ),
             ],
           ],
