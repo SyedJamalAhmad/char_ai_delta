@@ -27,28 +27,32 @@ class AdMobAdsProvider {
   RewardedAd? _rewardedAd;
   int _numRewardedLoadAttempts = 0;
   RxBool isAdEnable = true.obs;
+  bool isInitialized = false;
 
-  String get interstitialAdUnitId => 'your_interstitial_ad_unit_id_here';
+  // String get interstitialAdUnitId => 'your_interstitial_ad_unit_id_here';
+  String get interstitialAdUnitId =>
+      'ca-app-pub-3940256099942544/1033173712'; // TEST ID
+
   int maxFailedLoadAttempts = 3;
   int adShowDelay = 30;
   DateTime? _lastInterstitialShownTime;
-
-  void initialize() {
-    // Initialize AdMob SDK
-    RequestConfiguration(testDeviceIds: ["4B3877ACBC411B954D545151A96C676D"]);
-    // Preload interstitial ad
-    _lastInterstitialShownTime = DateTime.now().subtract(Duration(seconds: 50));
-    _createInterstitialAd();
-    createRewardedAd();
-    // _createRewardedInterstitialAd();//? commented by jamal
-    // _createRewardedInterstitialAdGame();
-    // loadAdRewardedInter();
-    // createGameRewardedAd();
-    appOpenLoad();
+  Future<void> initialize() async {
+    try {
+      RequestConfiguration(testDeviceIds: ["48EB03B28964CF26EC2FB322A74E47DD"]);
+      _lastInterstitialShownTime =
+          DateTime.now().subtract(Duration(seconds: 50));
+      _createInterstitialAd();
+      createRewardedAd();
+      // initBanner();
+      appOpenLoad();
+    } catch (e, s) {
+      print('Error in initialize(): $e\n$s');
+    }
   }
 
   void _createInterstitialAd() {
-    InterstitialAd.load(
+    try {
+      InterstitialAd.load(
         adUnitId: AppStrings.ADMOB_INTERSTITIAL,
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
@@ -66,58 +70,65 @@ class AdMobAdsProvider {
               _createInterstitialAd();
             }
           },
-        ));
+        ),
+      );
+    } catch (e, s) {
+      print('Error in _createInterstitialAd(): $e\n$s');
+    }
   }
 
   void showInterstitialAd() {
-    int adShowDelay = 30;
+    try {
+      Duration timeSinceLastShown = DateTime.now()
+          .difference(_lastInterstitialShownTime ?? DateTime.now());
 
-    // Calculate the time difference between the current time and the last shown time
-    Duration timeSinceLastShown =
-        DateTime.now().difference(_lastInterstitialShownTime ?? DateTime.now());
+      if (timeSinceLastShown.inSeconds < adShowDelay) {
+        int remainingTime = adShowDelay - timeSinceLastShown.inSeconds;
+        print(
+            'Interstitial ad not ready yet. $remainingTime seconds remaining.');
+        return;
+      }
 
-    // Check if the minimum adShowDelay time has passed since the last ad was shown
-    if (timeSinceLastShown.inSeconds < adShowDelay) {
-      int remainingTime = adShowDelay - timeSinceLastShown.inSeconds;
-      print(
-          'Showing interstitial ad is not allowed yet. Remaining time: $remainingTime seconds.');
-      return;
+      if (_interstitialAd == null) {
+        print('Warning: No interstitial ad loaded.');
+        return;
+      }
+
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdShowedFullScreenContent: (ad) => print('Interstitial shown.'),
+        onAdDismissedFullScreenContent: (ad) {
+          print('Interstitial dismissed.');
+          ad.dispose();
+          _createInterstitialAd();
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          print('Interstitial failed to show: $error');
+          ad.dispose();
+          _createInterstitialAd();
+        },
+      );
+
+      _interstitialAd!.show();
+      _interstitialAd = null;
+      _lastInterstitialShownTime = DateTime.now();
+    } catch (e, s) {
+      print('Error in showInterstitialAd(): $e\n$s');
     }
-
-    if (_interstitialAd == null) {
-      print('Warning: attempt to show interstitial before loaded.');
-      return;
-    }
-
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) =>
-          print('ad onAdShowedFullScreenContent.'),
-      onAdDismissedFullScreenContent: (InterstitialAd ad) {
-        print('$ad onAdDismissedFullScreenContent.');
-        ad.dispose();
-        _createInterstitialAd();
-      },
-      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-        print('$ad onAdFailedToShowFullScreenContent: $error');
-        ad.dispose();
-        _createInterstitialAd();
-      },
-    );
-    _interstitialAd!.show();
-    _interstitialAd = null;
-    _lastInterstitialShownTime = DateTime.now();
   }
 
 //? ----------------------------------AppOPEN--------------------------------
   late AppLifecycleReactor _appLifecycleReactor;
   late AppOpenAdManager appOpenAdManager;
   void appOpenLoad() {
-    appOpenAdManager = AppOpenAdManager()..loadAppOpenAd();
-    _appLifecycleReactor =
-        AppLifecycleReactor(appOpenAdManager: appOpenAdManager);
+    if (AppOpenAdManager().appOpenAd == null) {
+    } else {
+      appOpenAdManager = AppOpenAdManager()..loadAppOpenAd();
+      _appLifecycleReactor =
+          AppLifecycleReactor(appOpenAdManager: appOpenAdManager);
 
-    _appLifecycleReactor.listenToAppStateChanges();
-    print("AppOpen Load from HomeCTL");
+      _appLifecycleReactor.listenToAppStateChanges();
+      print("AppOpen Load from HomeCTL");
+    }
   }
 
   void showAppOpen() {
@@ -130,67 +141,56 @@ class AdMobAdsProvider {
 
   late BannerAd myBanner;
   RxBool isBannerLoaded = false.obs;
+  void initBanner() {
+    try {
+      BannerAdListener listener = BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          print('Banner loaded.');
+          isBannerLoaded.value = true;
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+          print('Banner failed to load: $error');
+        },
+      );
 
-  initBanner() {
-    BannerAdListener listener = BannerAdListener(
-      // Called when an ad is successfully received.
-      onAdLoaded: (Ad ad) {
-        print('Ad loaded.');
-        isBannerLoaded.value = true;
-      },
-      // Called when an ad request failed.
-      onAdFailedToLoad: (Ad ad, LoadAdError error) {
-        // Dispose the ad here to free resources.
-        ad.dispose();
-        print('Ad failed to load: $error');
-      },
-      // Called when an ad opens an overlay that covers the screen.
-      onAdOpened: (Ad ad) {
-        print('Ad opened.');
-      },
-      // Called when an ad removes an overlay that covers the screen.
-      onAdClosed: (Ad ad) {
-        print('Ad closed.');
-      },
-      // Called when an impression occurs on the ad.
-      onAdImpression: (Ad ad) {
-        print('Ad impression.');
-      },
-    );
+      myBanner = BannerAd(
+        adUnitId: AppStrings.ADMOB_BANNER,
+        size: AdSize.mediumRectangle,
+        request: AdRequest(),
+        listener: listener,
+      );
 
-    BannerAd myBanner = BannerAd(
-      adUnitId: AppStrings.ADMOB_BANNER,
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: listener,
-    );
-    myBanner.load();
+      myBanner.load();
+    } catch (e, s) {
+      print('Error in initBanner(): $e\n$s');
+    }
   }
 
   //? Native Ad Implementation
   NativeAd? _nativeAd;
   RxBool nativeAdIsLoaded = false.obs;
 
-  initNative() {
-    _nativeAd = NativeAd(
-      adUnitId: AppStrings.ADMOB_NATIVE,
-      request: AdRequest(),
-      factoryId: 'adFactoryExample',
-      listener: NativeAdListener(
-        onAdLoaded: (Ad ad) {
-          print('$NativeAd loaded.');
+  // initNative() {
+  //   _nativeAd = NativeAd(
+  //     adUnitId: AppStrings.ADMOB_NATIVE,
+  //     request: AdRequest(),
+  //     factoryId: 'adFactoryExample',
+  //     listener: NativeAdListener(
+  //       onAdLoaded: (Ad ad) {
+  //         print('$NativeAd loaded.');
 
-          nativeAdIsLoaded.value = true;
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('$NativeAd failedToLoad: $error');
-          ad.dispose();
-        },
-        onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
-        onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
-      ),
-    )..load();
-  }
+  //         nativeAdIsLoaded.value = true;
+  //       },
+  //       onAdFailedToLoad: (Ad ad, LoadAdError error) {
+  //         print('$NativeAd failedToLoad: $error');
+  //         ad.dispose();
+  //       },
+  //       onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
+  //       onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
+  //     ),
+  //   )..load();
+  // }
 
   //?Reward Inter Implementation
 
@@ -293,30 +293,32 @@ class AdMobAdsProvider {
     });
   }
 
-  //? Rewarded Ad Implementation
   void createRewardedAd() {
-    print("Reward Ad Load Called");
-    if (_rewardedAd == null) {
-      print("Reward Ad was Null");
-
-      RewardedAd.load(
+    try {
+      print("Reward Ad Load Called");
+      if (_rewardedAd == null) {
+        RewardedAd.load(
           adUnitId: AppStrings.ADMOB_REWARDED,
           request: AdRequest(),
           rewardedAdLoadCallback: RewardedAdLoadCallback(
             onAdLoaded: (RewardedAd ad) {
-              print('$ad loaded. Reward Ad');
+              print('Rewarded ad loaded.');
               _rewardedAd = ad;
               _numRewardedLoadAttempts = 0;
             },
             onAdFailedToLoad: (LoadAdError error) {
-              print('RewardedAd failed to load: $error');
+              print('Rewarded ad failed to load: $error');
               _rewardedAd = null;
-              _numRewardedLoadAttempts += 1;
+              _numRewardedLoadAttempts++;
               if (_numRewardedLoadAttempts < maxFailedLoadAttempts) {
                 createRewardedAd();
               }
             },
-          ));
+          ),
+        );
+      }
+    } catch (e, s) {
+      print('Error in createRewardedAd(): $e\n$s');
     }
   }
 

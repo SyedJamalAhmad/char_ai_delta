@@ -26,8 +26,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 class HomeCarouselView extends GetView<HomeViewCTL> {
-  
-   HomeCarouselView({super.key});
+  HomeCarouselView({super.key});
 
   // // // Banner Ad Implementation start // // //
 
@@ -73,19 +72,19 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
     );
     myBanner.load();
   }
+
   //? commented by jamal end
 
   /// Banner Ad Implementation End ///
-  
 
   @override
   Widget build(BuildContext context) {
     Provider.of<ConnectionProvider>(context, listen: false)
         .setIgnoreConnectionCheck(false);
-         initBanner(); //? commented by jamal
+    initBanner(); //? commented by jamal
+
     return Scaffold(
-      
-   
+
         // appBar: AppBar(
         // title: Text('Chat Views'),
         // bottom: TabBar(
@@ -105,58 +104,65 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         //     }).toList(),
         //   ),
         body: Stack(
-          children: [
-            Container(
-              color: Colors.white38,
-              // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
-              child: StreamBuilder<QuerySnapshot>(
-                  stream: controller.categoriesStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error fetching categories'));
-                    }
+      children: [
+        Container(
+          color: Colors.white38,
+          // padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
+          child: StreamBuilder<QuerySnapshot>(
+              stream: controller.categoriesStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error fetching categories'));
+                }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-                    final newCategory = snapshot.data!.docs
-                        .where((doc) => doc.id == "New")
-                        .first;
+                final newCategory =
+                    snapshot.data!.docs.where((doc) => doc.id == "New").first;
 
-                    List<FirebaseCatagory> otherCategoriesList = snapshot
-                        .data!.docs
-                        .map((doc) => FirebaseCatagory.fromJson(
-                            doc.data() as Map<String, dynamic>, doc.id))
-                        .toList();
+                List<FirebaseCatagory> otherCategoriesList = snapshot.data!.docs
+                    .map((doc) => FirebaseCatagory.fromJson(
+                        doc.data() as Map<String, dynamic>, doc.id))
+                    .toList();
 
-                    otherCategoriesList
-                        .sort(((a, b) => a.priority - b.priority));
+                otherCategoriesList.sort(((a, b) => a.priority - b.priority));
 
-                    return _allCategoriesViews(otherCategoriesList);
-                    //     Expanded(
-                    //   child: _allCategoriesViews(otherCategoriesList),
-                    // );
-                  }),
-            ),
-            Obx(() => controller.showOverlay1.value
-                ? guideWithOverlay(() {
-                    controller.dismissOverlay1();
-                  }, "assets/animations/tap-animation.gif",
-                    controller.isTransparent.value, "Tap to chat")
-                : Container()),
-            Obx(() => controller.showOverlay2.value
-                ? guideWithOverlay(() {
-                    controller.dismissOverlay2();
-                  }, "assets/animations/swipe-animation.gif",
-                    controller.isTransparent.value, "Swipe to change character")
-                : Container()),
-            Obx(() => controller.isShowOverlay3.value
-                ? tapGuide("assets/animations/tap-animation.gif",
-                    controller.isTransparent.value)
-                : Container()),
-          ],
-        ));
+                return _allCategoriesViews(otherCategoriesList);
+                //     Expanded(
+                //   child: _allCategoriesViews(otherCategoriesList),
+                // );
+              }),
+        ),
+        Obx(() => controller.showOverlay1.value
+            ? guideWithOverlay(() {
+                controller.dismissOverlay1();
+              }, "assets/animations/tap-animation.gif",
+                controller.isTransparent.value, "Tap to chat")
+            : Container()),
+        Obx(() => controller.showOverlay2.value
+            ? guideWithOverlay(() {
+                controller.dismissOverlay2();
+              }, "assets/animations/swipe-animation.gif",
+                controller.isTransparent.value, "Swipe to change character")
+            : Container()),
+        Obx(() => controller.isShowOverlay3.value
+            ? tapGuide("assets/animations/tap-animation.gif",
+                controller.isTransparent.value)
+            : Container()),
+        Obx(
+          () => Align(
+              alignment: Alignment.bottomCenter,
+              child: isBannerLoaded.value &&
+                      AdMobAdsProvider.instance.isAdEnable.value
+                  ? Container(
+                      height: AdSize.banner.height.toDouble(),
+                      child: AdWidget(ad: myBanner))
+                  : Container()),
+        )
+      ],
+    ));
   }
 
   GestureDetector guideWithOverlay(Function onTapFunction, String imagePath,
@@ -192,7 +198,7 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                     alignment: Alignment.bottomCenter,
                     child: Container(
                       margin: EdgeInsets.only(
-                          bottom: SizeConfig.blockSizeVertical * 5),
+                          bottom: SizeConfig.blockSizeVertical * 8),
                       child: Text(guideText),
                     ),
                   ),
@@ -325,16 +331,18 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         String history = character.historyMessages ?? "";
         print("Firebase History: $history");
         controller.openAvatarChat(aiChatModel, character);
-        if (controller.adCounter == 3) {
-          controller.adCounter = 1;
-          if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
-            MetaAdsProvider.instance.showInterstitialAd();
-          } else {
-            // AppLovinProvider.instance.showInterstitial(() {}, false);
-          }
-        } else {
-          controller.adCounter++;
-        }
+        AdMobAdsProvider.instance.showInterstitialAd();
+
+        // if (controller.adCounter == 3) {
+        //   controller.adCounter = 1;
+        //   if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
+        //     MetaAdsProvider.instance.showInterstitialAd();
+        //   } else {
+        //     // AppLovinProvider.instance.showInterstitial(() {}, false);
+        //   }
+        // } else {
+        //   controller.adCounter++;
+        // }
       },
       child: Stack(children: [
         // Container(
@@ -373,7 +381,6 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                 ),
               ),
             ),
-            
           ],
         ),
         Container(
@@ -414,8 +421,9 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
             ),
           ),
         ),
-       
+
         Container(
+          height: SizeConfig.blockSizeVertical * 10,
           padding: EdgeInsets.only(
               top: SizeConfig.blockSizeVertical * 5,
               right: SizeConfig.blockSizeHorizontal * 5,
@@ -423,7 +431,8 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
           child: Container(
             // padding:
             //     EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   character.title,
@@ -439,31 +448,30 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                   ),
                 ),
                 Container(
-                  child: Obx(() =>
-            controller.showOverlay1.value || controller.showOverlay2.value
-                ? Container()
-                : Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color.fromARGB(82, 0, 0, 0)),
-                    child: IconButton(
-                        // highlightColor: Colors.amber,
-                        color: Colors.white,
-                        onPressed: () {
-                          controller.showOverlay1.value = true;
-                          controller.hintButtonPressed.value = true;
-                        },
-                        icon: Icon(Icons.question_mark_outlined)),
-                  ).asGlass(
-                    blurX: 4,
-                    blurY: 4,
-                    clipBorderRadius: BorderRadius.circular(30))),
-                )
+                  child: Obx(() => controller.showOverlay1.value ||
+                          controller.showOverlay2.value
+                      ? Container()
+                      : Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color.fromARGB(82, 0, 0, 0)),
+                          child: IconButton(
+                              // highlightColor: Colors.amber,
+                              color: Colors.white,
+                              onPressed: () {
+                                controller.showOverlay1.value = true;
+                                controller.hintButtonPressed.value = true;
+                              },
+                              icon: Icon(Icons.question_mark_outlined)),
+                        ).asGlass(
+                          blurX: 4,
+                          blurY: 4,
+                          clipBorderRadius: BorderRadius.circular(30))),
+                ),
               ],
             ),
           ),
         ),
-         
       ]),
     );
   }

@@ -65,12 +65,16 @@ android {
 
     dependencies {
     // Add this dependency for core library desugaring
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.72'
+
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'  // or the latest version
     implementation 'com.applovin:applovin-sdk:+'
     implementation 'com.facebook.infer.annotation:infer-annotation:0.18.0'
     // implementation 'com.applovin.mediation:facebook-adapter:+'
 }
 }
+
+
 
 flutter {
     source = "../.."

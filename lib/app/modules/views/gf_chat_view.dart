@@ -2,8 +2,10 @@ import 'dart:developer';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
+import 'package:character_ai_delta/app/provider/admob_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/services/revenuecat_service.dart';
+import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:character_ai_delta/app/utills/images.dart';
 import 'package:character_ai_delta/app/utills/style.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
@@ -13,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:glass/glass.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -30,6 +33,7 @@ class GfChatView extends GetView<GfChatViewController>
   @override
   GfChatView() {
     WidgetsBinding.instance.addObserver(this);
+    initBanner();
   }
 
   @override
@@ -42,6 +46,47 @@ class GfChatView extends GetView<GfChatViewController>
     }
   }
 
+  late BannerAd myBanner;
+
+  RxBool isBannerLoaded = false.obs;
+
+  initBanner() {
+    BannerAdListener listener = BannerAdListener(
+      // Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) {
+        print('Banner Ad loaded.');
+        isBannerLoaded.value = true;
+        print("isBannerLoaded = $isBannerLoaded");
+      },
+      // Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        // Dispose the ad here to free resources.
+        ad.dispose();
+        print('Banner Ad failed to load: $error');
+      },
+      // Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) {
+        print('Banner Ad opened.');
+      },
+      // Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) {
+        print('Banner Ad closed.');
+      },
+      // Called when an impression occurs on the ad.
+      onAdImpression: (Ad ad) {
+        print('Banner Ad impression.');
+      },
+    );
+
+    myBanner = BannerAd(
+      adUnitId: AppStrings.ADMOB_BANNER,
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: listener,
+    );
+    myBanner.load();
+  }
+
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
@@ -52,6 +97,7 @@ class GfChatView extends GetView<GfChatViewController>
           // If no widget has focus, close the keyboard (optional)
           FocusManager.instance.primaryFocus?.unfocus();
           controller.stopTextMessageSpeech();
+          AdMobAdsProvider.instance.showInterstitialAd();
 
           return true; // Allow back navigation
         }
@@ -66,6 +112,7 @@ class GfChatView extends GetView<GfChatViewController>
         } else {
           log("backed");
           controller.stopTextMessageSpeech();
+          AdMobAdsProvider.instance.showInterstitialAd();
           return true; // Allow back navigation
         }
       },
@@ -128,7 +175,7 @@ class GfChatView extends GetView<GfChatViewController>
                                     : Container(
                                         margin: EdgeInsets.only(
                                           top:
-                                              SizeConfig.blockSizeVertical * 13,
+                                              SizeConfig.blockSizeVertical * 15,
                                           bottom:
                                               SizeConfig.blockSizeVertical * 1,
                                         ),
@@ -255,7 +302,7 @@ class GfChatView extends GetView<GfChatViewController>
       child: Container(
         padding: EdgeInsets.symmetric(
             horizontal: SizeConfig.blockSizeHorizontal * 3),
-        // height: Get.statusBarHeight * SizeConfig.blockSizeVertical * 20,
+        height: SizeConfig.blockSizeVertical * 20,
         color: const Color.fromARGB(26, 0, 0, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -289,6 +336,7 @@ class GfChatView extends GetView<GfChatViewController>
                         FocusManager.instance.primaryFocus!.unfocus();
                       }
                       controller.stopTextMessageSpeech();
+                      AdMobAdsProvider.instance.showInterstitialAd();
 
                       Get.back();
                     },
@@ -351,9 +399,16 @@ class GfChatView extends GetView<GfChatViewController>
                 ],
               ),
             ),
+            Obx(() => isBannerLoaded.value &&
+                    AdMobAdsProvider.instance.isAdEnable.value
+                ? Container(
+                    height: AdSize.banner.height.toDouble(),
+                    child: AdWidget(ad: myBanner))
+                : Container()),
             // AppLovinProvider.instance.ShowBannerWidget(),
-            Container(
-              // margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.1),
+            verticalSpace(SizeConfig.blockSizeVertical * 2),
+            Align(
+              alignment: Alignment.bottomCenter,
               child: Text(
                 "Note: This is AI Generated Content",
                 style: StyleSheet.noteHeading,
