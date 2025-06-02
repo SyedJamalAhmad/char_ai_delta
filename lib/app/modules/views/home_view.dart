@@ -1,13 +1,11 @@
 import 'dart:io';
 
-import 'package:applovin_max/applovin_max.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/data/firebase_categories.dart';
 import 'package:character_ai_delta/app/modules/controllers/home_view_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:character_ai_delta/app/utills/colors.dart';
@@ -273,7 +271,8 @@ class HomeView extends GetView<HomeViewCTL> {
             return Container(
                 // height: 60,
                 // color: Colors.amber,
-                child: AppLovinProvider.instance.showMrecWidget());
+                // child: AppLovinProvider.instance.showMrecWidget()
+                );
           } else {
             //?Empty Container
             return Container(
@@ -430,7 +429,7 @@ class HomeView extends GetView<HomeViewCTL> {
           if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
             MetaAdsProvider.instance.showInterstitialAd();
           } else {
-            AppLovinProvider.instance.showInterstitial(() {}, false);
+            // AppLovinProvider.instance.showInterstitial(() {}, false);
           }
         } else {
           controller.adCounter++;
@@ -556,7 +555,7 @@ class HomeView extends GetView<HomeViewCTL> {
           if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
             MetaAdsProvider.instance.showInterstitialAd();
           } else {
-            AppLovinProvider.instance.showInterstitial(() {}, false);
+            // AppLovinProvider.instance.showInterstitial(() {}, false);
           }
         } else {
           controller.adCounter++;

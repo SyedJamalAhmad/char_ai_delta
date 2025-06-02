@@ -59,7 +59,7 @@ dependencies:
   provider: ^6.1.2
   # launch_review: ^3.0.1
   # applovin_max: ^3.3.0
-  applovin_max: ^3.10.0
+  # applovin_max: ^3.10.0
   firebase_core: ^2.32.0
   firebase_analytics: ^10.5.1
   # flutter_gemini: ^1.0.1
@@ -95,6 +95,7 @@ dependencies:
   permission_handler: ^11.4.0
   glass: ^2.0.0+2
   flutter_tts: ^4.2.2
+  google_mobile_ads: ^6.0.0
 
 
 dev_dependencies:

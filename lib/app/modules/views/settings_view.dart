@@ -1,6 +1,4 @@
-import 'package:applovin_max/applovin_max.dart';
 import 'package:character_ai_delta/app/modules/controllers/settings_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,33 +33,33 @@ class SettingsView extends GetView<SettingsCTL> {
         ),
         body: Column(children: [
           verticalSpace(SizeConfig.blockSizeVertical * 2),
-          Container(
-            // height: 60,
-            // color: Colors.amber,
-            child: Align(
-              alignment: Alignment.center,
-              child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
-                  ? MaxAdView(
-                      adUnitId: AppStrings.MAX_BANNER_ID,
-                      adFormat: AdFormat.banner,
-                      listener: AdViewAdListener(onAdLoadedCallback: (ad) {
-                        print('Banner widget ad loaded from ' + ad.networkName);
-                      }, onAdLoadFailedCallback: (adUnitId, error) {
-                        print(
-                            'Banner widget ad failed to load with error code ' +
-                                error.code.toString() +
-                                ' and message: ' +
-                                error.message);
-                      }, onAdClickedCallback: (ad) {
-                        print('Banner widget ad clicked');
-                      }, onAdExpandedCallback: (ad) {
-                        print('Banner widget ad expanded');
-                      }, onAdCollapsedCallback: (ad) {
-                        print('Banner widget ad collapsed');
-                      }))
-                  : Container()),
-            ),
-          ),
+          // Container(
+          //   // height: 60,
+          //   // color: Colors.amber,
+          //   child: Align(
+          //     alignment: Alignment.center,
+          //     child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
+          //         ? MaxAdView(
+          //             adUnitId: AppStrings.MAX_BANNER_ID,
+          //             adFormat: AdFormat.banner,
+          //             listener: AdViewAdListener(onAdLoadedCallback: (ad) {
+          //               print('Banner widget ad loaded from ' + ad.networkName);
+          //             }, onAdLoadFailedCallback: (adUnitId, error) {
+          //               print(
+          //                   'Banner widget ad failed to load with error code ' +
+          //                       error.code.toString() +
+          //                       ' and message: ' +
+          //                       error.message);
+          //             }, onAdClickedCallback: (ad) {
+          //               print('Banner widget ad clicked');
+          //             }, onAdExpandedCallback: (ad) {
+          //               print('Banner widget ad expanded');
+          //             }, onAdCollapsedCallback: (ad) {
+          //               print('Banner widget ad collapsed');
+          //             }))
+          //         : Container()),
+          //   ),
+          // ),
           // Container(
           //   height: SizeConfig.screenHeight,
           //   width: SizeConfig.screenWidth,
@@ -90,33 +88,33 @@ class SettingsView extends GetView<SettingsCTL> {
                 "Spread the World", Icons.arrow_forward_ios_rounded),
           ),
           verticalSpace(SizeConfig.blockSizeVertical * 5),
-          Container(
-            // height: 60,
-            // color: Colors.amber,
-            child: Align(
-              alignment: Alignment.center,
-              child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
-                  ? MaxAdView(
-                      adUnitId: AppStrings.MAX_MREC_ID,
-                      adFormat: AdFormat.mrec,
-                      listener: AdViewAdListener(onAdLoadedCallback: (ad) {
-                        print('Banner widget ad loaded from ' + ad.networkName);
-                      }, onAdLoadFailedCallback: (adUnitId, error) {
-                        print(
-                            'Banner widget ad failed to load with error code ' +
-                                error.code.toString() +
-                                ' and message: ' +
-                                error.message);
-                      }, onAdClickedCallback: (ad) {
-                        print('Banner widget ad clicked');
-                      }, onAdExpandedCallback: (ad) {
-                        print('Banner widget ad expanded');
-                      }, onAdCollapsedCallback: (ad) {
-                        print('Banner widget ad collapsed');
-                      }))
-                  : Container()),
-            ),
-          ),
+          // Container(
+          //   // height: 60,
+          //   // color: Colors.amber,
+          //   child: Align(
+          //     alignment: Alignment.center,
+          //     child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
+          //         ? MaxAdView(
+          //             adUnitId: AppStrings.MAX_MREC_ID,
+          //             adFormat: AdFormat.mrec,
+          //             listener: AdViewAdListener(onAdLoadedCallback: (ad) {
+          //               print('Banner widget ad loaded from ' + ad.networkName);
+          //             }, onAdLoadFailedCallback: (adUnitId, error) {
+          //               print(
+          //                   'Banner widget ad failed to load with error code ' +
+          //                       error.code.toString() +
+          //                       ' and message: ' +
+          //                       error.message);
+          //             }, onAdClickedCallback: (ad) {
+          //               print('Banner widget ad clicked');
+          //             }, onAdExpandedCallback: (ad) {
+          //               print('Banner widget ad expanded');
+          //             }, onAdCollapsedCallback: (ad) {
+          //               print('Banner widget ad collapsed');
+          //             }))
+          //         : Container()),
+          //   ),
+          // ),
         ]));
   }
 

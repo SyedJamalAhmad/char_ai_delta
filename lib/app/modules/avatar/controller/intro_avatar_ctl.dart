@@ -1,7 +1,6 @@
 import 'package:character_ai_delta/app/data/user_avatar.dart';
 import 'package:character_ai_delta/app/modules/avatar/views/avatar_view.dart';
 import 'package:character_ai_delta/app/modules/controllers/create_avatar_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/useravatar_dbhelper.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
@@ -158,7 +157,7 @@ class IntroAvatarCTL extends GetxController {
       if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
         MetaAdsProvider.instance.showInterstitialAd();
       } else {
-        AppLovinProvider.instance.showInterstitial(() {}, false);
+        // AppLovinProvider.instance.showInterstitial(() {}, false);
       }
       // Get.off(Routes.NavView);
       Get.until((route) => Get.currentRoute == Routes.NavView);

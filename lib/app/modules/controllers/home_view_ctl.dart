@@ -7,7 +7,6 @@ import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/data/firebase_categories.dart';
 import 'package:character_ai_delta/app/notificationservice/local_notification_service.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:character_ai_delta/app/utills/app_const.dart';
@@ -163,7 +162,7 @@ class HomeViewCTL extends GetxController {
         if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
           MetaAdsProvider.instance.showInterstitialAd();
         } else {
-          AppLovinProvider.instance.showInterstitial(() {}, false);
+          // AppLovinProvider.instance.showInterstitial(() {}, false);
         }
       } else {
         adCounter++;

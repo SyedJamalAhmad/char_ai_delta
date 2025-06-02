@@ -7,10 +7,11 @@ import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/data/firebase_categories.dart';
 import 'package:character_ai_delta/app/modules/controllers/home_view_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
+import 'package:character_ai_delta/app/provider/admob_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/connection_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
+import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:character_ai_delta/app/utills/colors.dart';
 import 'package:character_ai_delta/app/utills/images.dart';
 import 'package:character_ai_delta/app/utills/size_config.dart';
@@ -21,35 +22,70 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:glass/glass.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 class HomeCarouselView extends GetView<HomeViewCTL> {
-  const HomeCarouselView({super.key});
+  
+   HomeCarouselView({super.key});
+
+  // // // Banner Ad Implementation start // // //
+
+  //? commented by jamal start
+
+  late BannerAd myBanner;
+
+  RxBool isBannerLoaded = false.obs;
+
+  initBanner() {
+    BannerAdListener listener = BannerAdListener(
+      // Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) {
+        print('Banner Ad loaded.');
+        isBannerLoaded.value = true;
+        print("isBannerLoaded = $isBannerLoaded");
+      },
+      // Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        // Dispose the ad here to free resources.
+        ad.dispose();
+        print('Banner Ad failed to load: $error');
+      },
+      // Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) {
+        print('Banner Ad opened.');
+      },
+      // Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) {
+        print('Banner Ad closed.');
+      },
+      // Called when an impression occurs on the ad.
+      onAdImpression: (Ad ad) {
+        print('Banner Ad impression.');
+      },
+    );
+
+    myBanner = BannerAd(
+      adUnitId: AppStrings.ADMOB_BANNER,
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: listener,
+    );
+    myBanner.load();
+  }
+  //? commented by jamal end
+
+  /// Banner Ad Implementation End ///
+  
 
   @override
   Widget build(BuildContext context) {
     Provider.of<ConnectionProvider>(context, listen: false)
         .setIgnoreConnectionCheck(false);
+         initBanner(); //? commented by jamal
     return Scaffold(
-        floatingActionButton: Obx(() =>
-            controller.showOverlay1.value || controller.showOverlay2.value
-                ? Container()
-                : Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color.fromARGB(82, 0, 0, 0)),
-                    child: IconButton(
-                        // highlightColor: Colors.amber,
-                        color: Colors.white,
-                        onPressed: () {
-                          controller.showOverlay1.value = true;
-                          controller.hintButtonPressed.value = true;
-                        },
-                        icon: Icon(Icons.question_mark_outlined)),
-                  ).asGlass(
-                    blurX: 4,
-                    blurY: 4,
-                    clipBorderRadius: BorderRadius.circular(30))),
+      
+   
         // appBar: AppBar(
         // title: Text('Chat Views'),
         // bottom: TabBar(
@@ -294,7 +330,7 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
           if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
             MetaAdsProvider.instance.showInterstitialAd();
           } else {
-            AppLovinProvider.instance.showInterstitial(() {}, false);
+            // AppLovinProvider.instance.showInterstitial(() {}, false);
           }
         } else {
           controller.adCounter++;
@@ -319,21 +355,26 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         //       height: SizeConfig.screenHeight,
         //       child: CachedNetworkImage(imageUrl: controller.main_image.value),
         //     )),
-        Container(
-          width: SizeConfig.screenWidth,
-          height: SizeConfig.screenHeight,
-          child: Hero(
-            tag: character.title,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.cardBackground_color,
-                image: DecorationImage(
-                  fit: BoxFit.cover, // Fill the entire container
-                  image: CachedNetworkImageProvider(character.imageUrl),
+        Row(
+          children: [
+            Container(
+              width: SizeConfig.screenWidth,
+              height: SizeConfig.screenHeight,
+              child: Hero(
+                tag: character.title,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBackground_color,
+                    image: DecorationImage(
+                      fit: BoxFit.cover, // Fill the entire container
+                      image: CachedNetworkImageProvider(character.imageUrl),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            
+          ],
         ),
         Container(
           color: const Color.fromARGB(59, 0, 0, 0),
@@ -373,6 +414,7 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
             ),
           ),
         ),
+       
         Container(
           padding: EdgeInsets.only(
               top: SizeConfig.blockSizeVertical * 5,
@@ -381,21 +423,47 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
           child: Container(
             // padding:
             //     EdgeInsets.only(top: SizeConfig.blockSizeVertical * 2),
-            child: Text(
-              character.title,
-              style: TextStyle(
-                color: Color(0xFFFFFFFF), // #FFF in hexadecimal
-                fontFamily:
-                    'Iceland', // make sure to add the font file to your project
-                fontSize: 25.0, // in logical pixels
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.bold,
-                // w400, // normal weight
-                height: 1.0, // normal line height
-              ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  character.title,
+                  style: TextStyle(
+                    color: Color(0xFFFFFFFF), // #FFF in hexadecimal
+                    fontFamily:
+                        'Iceland', // make sure to add the font file to your project
+                    fontSize: 25.0, // in logical pixels
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.bold,
+                    // w400, // normal weight
+                    height: 1.0, // normal line height
+                  ),
+                ),
+                Container(
+                  child: Obx(() =>
+            controller.showOverlay1.value || controller.showOverlay2.value
+                ? Container()
+                : Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color.fromARGB(82, 0, 0, 0)),
+                    child: IconButton(
+                        // highlightColor: Colors.amber,
+                        color: Colors.white,
+                        onPressed: () {
+                          controller.showOverlay1.value = true;
+                          controller.hintButtonPressed.value = true;
+                        },
+                        icon: Icon(Icons.question_mark_outlined)),
+                  ).asGlass(
+                    blurX: 4,
+                    blurY: 4,
+                    clipBorderRadius: BorderRadius.circular(30))),
+                )
+              ],
             ),
           ),
         ),
+         
       ]),
     );
   }

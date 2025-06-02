@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/data/firebase_categories.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:character_ai_delta/app/utills/colors.dart';
 import 'package:character_ai_delta/app/utills/images.dart';

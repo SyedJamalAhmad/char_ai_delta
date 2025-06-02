@@ -2,13 +2,11 @@ import 'dart:developer';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/services/revenuecat_service.dart';
 import 'package:character_ai_delta/app/utills/images.dart';
 import 'package:character_ai_delta/app/utills/style.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
-import 'package:applovin_max/applovin_max.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -277,8 +275,8 @@ class GfChatView extends GetView<GfChatViewController>
                         if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
                           MetaAdsProvider.instance.showInterstitialAd();
                         } else {
-                          AppLovinProvider.instance
-                              .showInterstitial(() {}, false);
+                          // AppLovinProvider.instance
+                          //     .showInterstitial(() {}, false);
                         }
                       }
                       controller.current_index.value = 0;
@@ -353,7 +351,7 @@ class GfChatView extends GetView<GfChatViewController>
                 ],
               ),
             ),
-            AppLovinProvider.instance.ShowBannerWidget(),
+            // AppLovinProvider.instance.ShowBannerWidget(),
             Container(
               // margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.1),
               child: Text(

@@ -1,5 +1,4 @@
 import 'package:character_ai_delta/app/modules/controllers/nav_view_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/utills/colors.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -35,7 +34,7 @@ class NavView extends GetView<NavCTL> {
                 if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
                   MetaAdsProvider.instance.showInterstitialAd();
                 } else {
-                  AppLovinProvider.instance.showInterstitial(() {}, false);
+                  // AppLovinProvider.instance.showInterstitial(() {}, false);
                 }
                 controller.navAdCounter = 0;
               } else {

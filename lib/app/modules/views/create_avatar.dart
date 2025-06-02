@@ -1,9 +1,7 @@
-import 'package:applovin_max/applovin_max.dart';
 import 'package:character_ai_delta/app/data/ai_model.dart';
 import 'package:character_ai_delta/app/data/firbase_charecters.dart';
 import 'package:character_ai_delta/app/modules/controllers/create_avatar_ctl.dart';
 import 'package:character_ai_delta/app/modules/controllers/home_view_ctl.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/provider/meta_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
@@ -79,7 +77,7 @@ class CreateAvatar extends GetView<CreateAvatarCTL> {
         if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
           MetaAdsProvider.instance.showInterstitialAd();
         } else {
-          AppLovinProvider.instance.showInterstitial(() {}, false);
+          // AppLovinProvider.instance.showInterstitial(() {}, false);
         }
       },
       child: Container(
@@ -160,34 +158,34 @@ class CreateAvatar extends GetView<CreateAvatarCTL> {
                 ),
               ),
               verticalSpace(SizeConfig.blockSizeVertical * 2),
-              Container(
-                // color: Colors.red,
-                child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
-                    ? MaxAdView(
-                        adUnitId: AppStrings.MAX_MREC_ID,
-                        adFormat: AdFormat.mrec,
-                        listener: AdViewAdListener(onAdLoadedCallback: (ad) {
-                          FirebaseAnalytics.instance.logAdImpression(
-                            adFormat: "Mrec",
-                            adSource: ad.networkName,
-                            value: ad.revenue,
-                          );
-                          print('Mrec widget ad loaded from ' + ad.networkName);
-                        }, onAdLoadFailedCallback: (adUnitId, error) {
-                          print(
-                              'Mrec widget ad failed to load with error code ' +
-                                  error.code.toString() +
-                                  ' and message: ' +
-                                  error.message);
-                        }, onAdClickedCallback: (ad) {
-                          print('Mrec widget ad clicked');
-                        }, onAdExpandedCallback: (ad) {
-                          print('Mrec widget ad expanded');
-                        }, onAdCollapsedCallback: (ad) {
-                          print('Mrec widget ad collapsed');
-                        }))
-                    : Container()),
-              ),
+              // Container(
+              //   // color: Colors.red,
+              //   child: Obx(() => AppLovinProvider.instance.isAdsEnabled.value
+              //       ? MaxAdView(
+              //           adUnitId: AppStrings.MAX_MREC_ID,
+              //           adFormat: AdFormat.mrec,
+              //           listener: AdViewAdListener(onAdLoadedCallback: (ad) {
+              //             FirebaseAnalytics.instance.logAdImpression(
+              //               adFormat: "Mrec",
+              //               adSource: ad.networkName,
+              //               value: ad.revenue,
+              //             );
+              //             print('Mrec widget ad loaded from ' + ad.networkName);
+              //           }, onAdLoadFailedCallback: (adUnitId, error) {
+              //             print(
+              //                 'Mrec widget ad failed to load with error code ' +
+              //                     error.code.toString() +
+              //                     ' and message: ' +
+              //                     error.message);
+              //           }, onAdClickedCallback: (ad) {
+              //             print('Mrec widget ad clicked');
+              //           }, onAdExpandedCallback: (ad) {
+              //             print('Mrec widget ad expanded');
+              //           }, onAdCollapsedCallback: (ad) {
+              //             print('Mrec widget ad collapsed');
+              //           }))
+              //       : Container()),
+              // ),
             ],
           ),
         ),
@@ -207,7 +205,7 @@ class CreateAvatar extends GetView<CreateAvatarCTL> {
             if (MetaAdsProvider.instance.isInterstitialAdLoaded) {
               MetaAdsProvider.instance.showInterstitialAd();
             } else {
-              AppLovinProvider.instance.showInterstitial(() {}, false);
+              // AppLovinProvider.instance.showInterstitial(() {}, false);
             }
           },
           child: Container(

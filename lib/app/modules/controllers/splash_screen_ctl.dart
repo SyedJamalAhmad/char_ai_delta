@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
+import 'package:character_ai_delta/app/provider/admob_ads_provider.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:get/get.dart';
@@ -20,7 +20,8 @@ class SplashController extends GetxController {
   Rx<bool> isLoaded = false.obs;
   @override
   void onInit() async {
-    AppLovinProvider.instance.init();
+     AdMobAdsProvider.instance.initialize(); //? commented by jamal
+    // AppLovinProvider.instance.init();
     print('2 Fetched open: ${AppStrings.OPENAI_TOKEN}');
 
     RemoteConfigFunction();

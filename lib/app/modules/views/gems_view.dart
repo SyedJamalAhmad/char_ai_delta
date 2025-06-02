@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'package:applovin_max/applovin_max.dart';
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/utills/app_strings.dart';
 import 'package:character_ai_delta/app/utills/gems_rate.dart';
 import 'package:character_ai_delta/app/utills/images.dart';
@@ -127,36 +125,36 @@ class GemsView extends GetView<GemsViewController> {
                     //     ),
                     //   ),
                     // ),
-                    Container(
-                      // height: 60,
-                      // color: Colors.amber,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Obx(() => AppLovinProvider
-                                .instance.isAdsEnabled.value
-                            ? MaxAdView(
-                                adUnitId: AppStrings.MAX_MREC_ID,
-                                adFormat: AdFormat.mrec,
-                                listener:
-                                    AdViewAdListener(onAdLoadedCallback: (ad) {
-                                  print('Banner widget ad loaded from ' +
-                                      ad.networkName);
-                                }, onAdLoadFailedCallback: (adUnitId, error) {
-                                  print(
-                                      'Banner widget ad failed to load with error code ' +
-                                          error.code.toString() +
-                                          ' and message: ' +
-                                          error.message);
-                                }, onAdClickedCallback: (ad) {
-                                  print('Banner widget ad clicked');
-                                }, onAdExpandedCallback: (ad) {
-                                  print('Banner widget ad expanded');
-                                }, onAdCollapsedCallback: (ad) {
-                                  print('Banner widget ad collapsed');
-                                }))
-                            : Container()),
-                      ),
-                    ),
+                    // Container(
+                    //   // height: 60,
+                    //   // color: Colors.amber,
+                    //   child: Align(
+                    //     alignment: Alignment.center,
+                    //     child: Obx(() => AppLovinProvider
+                    //             .instance.isAdsEnabled.value
+                    //         ? MaxAdView(
+                    //             adUnitId: AppStrings.MAX_MREC_ID,
+                    //             adFormat: AdFormat.mrec,
+                    //             listener:
+                    //                 AdViewAdListener(onAdLoadedCallback: (ad) {
+                    //               print('Banner widget ad loaded from ' +
+                    //                   ad.networkName);
+                    //             }, onAdLoadFailedCallback: (adUnitId, error) {
+                    //               print(
+                    //                   'Banner widget ad failed to load with error code ' +
+                    //                       error.code.toString() +
+                    //                       ' and message: ' +
+                    //                       error.message);
+                    //             }, onAdClickedCallback: (ad) {
+                    //               print('Banner widget ad clicked');
+                    //             }, onAdExpandedCallback: (ad) {
+                    //               print('Banner widget ad expanded');
+                    //             }, onAdCollapsedCallback: (ad) {
+                    //               print('Banner widget ad collapsed');
+                    //             }))
+                    //         : Container()),
+                    //   ),
+                    // ),
 
                     // ? Commented by jamal start
                     // Platform.isAndroid
@@ -199,8 +197,8 @@ class GemsView extends GetView<GemsViewController> {
 
             // ? Commented by jamal end
             // //?Changed by Jamal[]
-            AppLovinProvider.instance
-                .showInterstitial(controller.increase_inter_gems, true);
+            // AppLovinProvider.instance
+            //     .showInterstitial(controller.increase_inter_gems, true);
           },
           child: Container(
             width: SizeConfig.screenWidth * 0.8,
@@ -228,8 +226,8 @@ class GemsView extends GetView<GemsViewController> {
 
             // ? Commented by jamal end
             ////?Changed by Jamal[]
-            AppLovinProvider.instance
-                .showInterstitial(controller.increase_reward_gems, true);
+            // AppLovinProvider.instance
+            //     .showInterstitial(controller.increase_reward_gems, true);
           },
           child: Container(
             width: SizeConfig.screenWidth * 0.8,

@@ -15,6 +15,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -22,6 +23,9 @@ Future<void> main() async {
   //     apiKey: 'AIzaSyCwMNpCEgkX_bxpq_hcxFa1CuN3fPZfk7o', enableDebugging: true);
   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
+  
+  MobileAds.instance.initialize();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

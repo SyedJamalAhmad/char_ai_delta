@@ -1,4 +1,3 @@
-import 'package:character_ai_delta/app/provider/applovin_ads_provider.dart';
 import 'package:character_ai_delta/app/routes/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +26,7 @@ class IntroScreensController extends GetxController {
 
   void goToHomePage() {
     setFirstTime(true);
-    AppLovinProvider.instance.showInterstitial(() {}, false);
+    // AppLovinProvider.instance.showInterstitial(() {}, false);
   }
 
   void setFirstTime(bool bool) {
