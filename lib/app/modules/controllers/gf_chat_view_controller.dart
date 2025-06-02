@@ -42,6 +42,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:vibration/vibration.dart';
 import 'package:video_player/video_player.dart';
 
 // import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -163,6 +164,12 @@ class GfChatViewController extends GetxController
     super.onReady();
   }
 
+  void handleAppMinimized() {
+    developer.log("App is minimized. Performing action...");
+    // Perform your action here
+    stopTextMessageSpeech();
+  }
+
   @override
   void onClose() {
     // TODO: implement onClose
@@ -176,6 +183,9 @@ class GfChatViewController extends GetxController
     typingAnimation!.removeListener(() {});
     animationController.dispose();
     textFieldFocusNode.dispose();
+    if (isVideoControllerInitialized.value) {
+      videoController.dispose();
+    }
 
     homectl.ShowFeedbackBottomSheet();
     super.onClose();
@@ -216,6 +226,10 @@ class GfChatViewController extends GetxController
   RxString recordedString = ''.obs;
   late BuildContext inputFieldContext;
   FlutterTts flutterTts = FlutterTts();
+  RxBool isSpeaking = false.obs;
+  RxInt selectedIndex = 0.obs;
+  RxInt startIndexSpokenWord = 0.obs;
+  RxInt endIndexSpokenWord = 0.obs;
 
   void initializeVideo(String videoUrl) {
     isVideoControllerInitialized.value = false;
@@ -241,14 +255,46 @@ class GfChatViewController extends GetxController
     }
   }
 
-  Future playTextMessageSpeech(String message) async {
+  Future playTextMessageSpeech(String message, int selectedIndexSetter) async {
+    // flutterTts.setVoice({"name": "ur-pk-x-cfn-local", "locale": "ur-PK"});
+
     developer.log("${await flutterTts.getVoices}");
+    selectedIndex.value = selectedIndexSetter;
+
+    flutterTts.progressHandler =
+        (String? message, int? start, int? end, String? word) {
+      developer.log("Message: $message, Start: $start, End: $end, Word: $word");
+      startIndexSpokenWord.value = start ?? -1;
+      endIndexSpokenWord.value = end ?? -1;
+    };
+    flutterTts.completionHandler = () {
+      developer.log("Speech completed");
+      startIndexSpokenWord.value = -1;
+      endIndexSpokenWord.value = -1;
+      isSpeaking.value = false;
+    };
+
     // flutterTts.setVoice({"name": "es-us-x-sfb-local", "locale": "es-US"});
     var result = await flutterTts.speak(message);
+
+    if (result == 1) {
+      isSpeaking.value = true;
+      developer.log("Playing message: $message");
+    } else {
+      developer.log("Error playing message: $message");
+    }
   }
 
-  Future stopTextMessageSpeech(String message) async {
+  Future stopTextMessageSpeech() async {
     var result = await flutterTts.stop();
+    if (result == 1) {
+      isSpeaking.value = false;
+      developer.log("Stopped speaking");
+    } else {
+      developer.log("Error stopping speech");
+    }
+    startIndexSpokenWord.value = -1;
+    endIndexSpokenWord.value = -1;
   }
 
   /// Request permissions and initialize SpeechToText
@@ -388,6 +434,21 @@ class GfChatViewController extends GetxController
     lastStatus.value = status;
     if (status == "done") {
       recordButtonColor.value = Colors.lightBlueAccent;
+      if (recordedString.value == "") {
+        if (await Vibration.hasVibrator()) {
+          Vibration.vibrate(duration: 100);
+        }
+        Fluttertoast.showToast(
+            msg: "No voice detected",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        developer.log("Vibrating");
+      }
+      recordedString.value = "";
 
       developer.log("Done Listening");
     }
@@ -408,14 +469,23 @@ class GfChatViewController extends GetxController
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) async {
+    developer.log("Result: ${result}");
     if (result.finalResult) {
+      textEditingController.text = result.recognizedWords;
+
       recordedString.value = result.recognizedWords;
       developer.log(
           "textController ${textEditingController.text} | recordedString  ${recordedString.value}");
-      await sendMessageButton();
+      await sendMessageButton(isVoiceResponse: true);
 
       developer.log("Result: ${result.recognizedWords}");
     } else {
+      // if (result.recognizedWords == "") {
+      //   developer.log("Vibrating inside empty recognized words");
+      //   if (await Vibration.hasVibrator()) {
+      //     Vibration.vibrate(duration: 100);
+      //   }
+      // }
       textEditingController.text = result.recognizedWords;
       developer.log("Partial Result: ${result.recognizedWords}");
     }
@@ -427,6 +497,8 @@ class GfChatViewController extends GetxController
     print("argument: $argument");
     await _checkPermissionsAndInitialize();
     await flutterTts.awaitSpeakCompletion(false);
+    flutterTts.completionHandler =
+        () => isSpeaking.value = false; // Set to false when done speaking
 
     recordedString.value = "";
 
@@ -545,13 +617,14 @@ class GfChatViewController extends GetxController
 
   List<Messages> conversation = [];
 
-  Future<void> sendMessageButton() async {
+  Future<void> sendMessageButton({bool isVoiceResponse = false}) async {
     print("Send Message ${textEditingController.text}");
     if (!wait.value) {
       if (textEditingController.text.isNotEmpty) {
         isWaitingForResponse.value = true;
         // ? Commented by jamal start
-        sendMessage("${textEditingController.text}", inputFieldContext);
+        sendMessage("${textEditingController.text}", inputFieldContext,
+            isVoiceResponse);
         //// ? Commented by jamal end
         lastMessage.value = textEditingController.text;
         textEditingController.clear();
@@ -560,18 +633,20 @@ class GfChatViewController extends GetxController
   }
 
 // ? Commented by jamal start
-  Future sendMessage(String message, context) async {
+  Future sendMessage(String message, context, bool isVoiceResponse) async {
     lastMessage.value = message;
     bool result = await InternetConnectionChecker().hasConnection;
     // print("credits:${request_limit.value}");
 
     // if (RevenueCatService().currentEntitlement.value == Entitlement.free) {
     if (homectl.gems.value > 0) {
-      ChatMessage userMessage =
-          ChatMessage(senderType: SenderType.User, message: message);
+      ChatMessage userMessage = ChatMessage(
+          senderType: SenderType.User,
+          message: message,
+          isVoiceResponse: isVoiceResponse);
       chatList.insert(0, userMessage);
 
-      await MessageApiCall(message, result, context);
+      await MessageApiCall(message, result, context, isVoiceResponse);
     } else {
       isWaitingForResponse.value = false;
 
@@ -624,7 +699,8 @@ class GfChatViewController extends GetxController
   }
 
 // ? Commented by jamal end
-  Future<void> MessageApiCall(String message, bool result, context) async {
+  Future<void> MessageApiCall(
+      String message, bool result, context, bool isVoiceResponse) async {
     if (message.isNotEmpty && result == true) {
       // if (message.isNotEmpty) {
       wait.value = true;
@@ -644,7 +720,10 @@ class GfChatViewController extends GetxController
       // saveHighPriorityMessage(message, "User", gender_title.value,
       //     homeController.uniqueId ?? "1234");
       saveLocalDBMessage(
-          message: message, userType: "user", aiChatModel: myAIChatModel);
+          message: message,
+          userType: "user",
+          aiChatModel: myAIChatModel,
+          isVoiceResponse: isVoiceResponse);
       // userMessages.add(message);
 
       String? geminiResponse = await sendGemeniMessage(chatList, message);
@@ -658,9 +737,9 @@ class GfChatViewController extends GetxController
       } else {
         //?Bard Response Recieved
         ChatMessage messageReceived = ChatMessage(
-          senderType: SenderType.Bot,
-          message: geminiResponse,
-        );
+            senderType: SenderType.Bot,
+            message: geminiResponse,
+            isVoiceResponse: isVoiceResponse);
         EasyLoading.dismiss();
 
         isWaitingForResponse.value = false;
@@ -672,7 +751,8 @@ class GfChatViewController extends GetxController
         saveLocalDBMessage(
             message: geminiResponse,
             userType: "bot",
-            aiChatModel: myAIChatModel);
+            aiChatModel: myAIChatModel,
+            isVoiceResponse: isVoiceResponse);
       }
 
       // print("chatList: ${chatList[0].input}");
@@ -849,10 +929,14 @@ class GfChatViewController extends GetxController
               "DBMessage: ${dbMessage.message}  Type: ${dbMessage.senderType}");
           if (dbMessage.senderType == "user") {
             chatList.add(ChatMessage(
-                senderType: SenderType.User, message: dbMessage.message));
+                senderType: SenderType.User,
+                message: dbMessage.message,
+                isVoiceResponse: dbMessage.isVoiceResponse));
           } else {
             chatList.add(ChatMessage(
-                senderType: SenderType.Bot, message: dbMessage.message));
+                senderType: SenderType.Bot,
+                message: dbMessage.message,
+                isVoiceResponse: dbMessage.isVoiceResponse));
           }
         }
 
@@ -868,11 +952,14 @@ class GfChatViewController extends GetxController
         chatList.insert(
             0,
             ChatMessage(
-              senderType: SenderType.Bot,
-              message: randomMessage,
-            ));
+                senderType: SenderType.Bot,
+                message: randomMessage,
+                isVoiceResponse: false));
         saveLocalDBMessage(
-            message: randomMessage, userType: "bot", aiChatModel: aiChatModel);
+            message: randomMessage,
+            userType: "bot",
+            aiChatModel: aiChatModel,
+            isVoiceResponse: false);
       }
       developer.log("DBMessage:");
     } on Exception catch (e) {
@@ -882,11 +969,14 @@ class GfChatViewController extends GetxController
         chatList.insert(
             0,
             ChatMessage(
-              senderType: SenderType.Bot,
-              message: randomMessage,
-            ));
+                senderType: SenderType.Bot,
+                message: randomMessage,
+                isVoiceResponse: false));
         saveLocalDBMessage(
-            message: randomMessage, userType: "bot", aiChatModel: aiChatModel);
+            message: randomMessage,
+            userType: "bot",
+            aiChatModel: aiChatModel,
+            isVoiceResponse: false);
       }
     }
 
@@ -906,9 +996,8 @@ class GfChatViewController extends GetxController
     // developer.log("chatContent $chatContent");
 
     try {
-      final response = await _chat.sendMessage(
-        Content.text(message),
-      );
+      final response = await _chat.sendMessage(Content.text(
+          "$message The response must be concise and should be under 30 words"));
       final text = response.text;
       if (text == null) {
         generatedMessage = getRandomDenielMessage();
@@ -1097,15 +1186,18 @@ class GfChatViewController extends GetxController
   Future<void> saveLocalDBMessage(
       {required String message,
       required String userType,
-      required AIChatModel aiChatModel}) async {
+      required AIChatModel aiChatModel,
+      required bool isVoiceResponse}) async {
     HomeViewCTL homeViewCTL = Get.find();
     developer.log("Saving Local Message");
     try {
       DBMessage dbMessage = DBMessage(
-          userId: homeViewCTL.uniqueId ?? "1234",
-          characterId: "${aiChatModel.name}_${aiChatModel.category}",
-          message: message,
-          senderType: userType);
+        userId: homeViewCTL.uniqueId ?? "1234",
+        characterId: "${aiChatModel.name}_${aiChatModel.category}",
+        message: message,
+        senderType: userType,
+        isVoiceResponse: isVoiceResponse,
+      );
       ChatHistoryDatabaseHelper.db.addChatMessage(dbMessage).then((value) {
         developer
             .log("Message Saved: ${aiChatModel.name}_${aiChatModel.category}");
@@ -1448,12 +1540,14 @@ enum SenderType {
 class ChatMessage {
   SenderType senderType;
   String message;
+  bool isVoiceResponse = false;
   Rx<bool> isFeedBack;
   Rx<bool> isGood;
 
   ChatMessage({
     required this.senderType,
     required this.message,
+    required this.isVoiceResponse,
     Rx<bool>? isFeedBack,
     Rx<bool>? isGood,
   })  : isFeedBack = isFeedBack ?? false.obs,

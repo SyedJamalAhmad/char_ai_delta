@@ -27,8 +27,23 @@ import '../../utills/size_config.dart';
 import '../controllers/gf_chat_view_controller.dart';
 // import '../controllers/chat_view_ctl.dart';
 
-class GfChatView extends GetView<GfChatViewController> {
+class GfChatView extends GetView<GfChatViewController>
+    with WidgetsBindingObserver {
   @override
+  GfChatView() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      controller.handleAppMinimized();
+    }
+  }
+
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
@@ -38,6 +53,8 @@ class GfChatView extends GetView<GfChatViewController> {
         if (!currentFocus.hasPrimaryFocus) {
           // If no widget has focus, close the keyboard (optional)
           FocusManager.instance.primaryFocus?.unfocus();
+          controller.stopTextMessageSpeech();
+
           return true; // Allow back navigation
         }
 
@@ -50,6 +67,7 @@ class GfChatView extends GetView<GfChatViewController> {
           return false; // Prevent immediate back navigation
         } else {
           log("backed");
+          controller.stopTextMessageSpeech();
           return true; // Allow back navigation
         }
       },
@@ -112,7 +130,9 @@ class GfChatView extends GetView<GfChatViewController> {
                                     : Container(
                                         margin: EdgeInsets.only(
                                           top:
-                                              SizeConfig.blockSizeVertical * 14,
+                                              SizeConfig.blockSizeVertical * 13,
+                                          bottom:
+                                              SizeConfig.blockSizeVertical * 1,
                                         ),
                                         child: Obx(() => ListView.builder(
                                               reverse: true,
@@ -270,6 +290,8 @@ class GfChatView extends GetView<GfChatViewController> {
                           currentFocus.focusedChild != null) {
                         FocusManager.instance.primaryFocus!.unfocus();
                       }
+                      controller.stopTextMessageSpeech();
+
                       Get.back();
                     },
                     child: Icon(
@@ -350,129 +372,127 @@ class GfChatView extends GetView<GfChatViewController> {
     controller.inputFieldContext = context;
     return Container(
       padding: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.5),
+      margin: EdgeInsets.only(top: SizeConfig.blockSizeVertical * 0.8),
       decoration: BoxDecoration(
         color: Color.fromARGB(215, 13, 13, 13),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
         ),
         // color: Colors.red,
       ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: SizeConfig.blockSizeHorizontal * 2,
+            vertical: SizeConfig.blockSizeVertical * 0.5),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    focusNode: controller.textFieldFocusNode,
+                    maxLength: 500,
+                    onChanged: (value) {
+                      print("value: $value");
+                      if (value == "") {
+                        controller.userIsTyping.value = false;
+                      } else {
+                        controller.userIsTyping.value = true;
+                      }
+                    },
+                    controller: controller.textEditingController,
+                    cursorColor: Color(0xEEF37B38),
+                    style: TextStyle(
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                      color: AppColors.white_color, // WhatsApp text color
+                    ),
+                    decoration: InputDecoration(
+                      fillColor: AppColors.white_color,
+                      // hintMaxLines: 10,
+                      hintText: "Write Your Message here...",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeVertical * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 2),
 
-      // ),
-      child: Container(
-        // color: Colors.red,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: SizeConfig.blockSizeHorizontal * 2,
-              vertical: SizeConfig.blockSizeVertical * 0.5),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      focusNode: controller.textFieldFocusNode,
-                      maxLength: 500,
-                      onChanged: (value) {
-                        print("value: $value");
-                        if (value == "") {
-                          controller.userIsTyping.value = false;
-                        } else {
-                          controller.userIsTyping.value = true;
-                        }
-                      },
-                      controller: controller.textEditingController,
-                      cursorColor: Color(0xEEF37B38),
-                      style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                        color: AppColors.white_color, // WhatsApp text color
-                      ),
-                      decoration: InputDecoration(
-                        fillColor: AppColors.white_color,
-                        // hintMaxLines: 10,
-                        hintText: "Write Your Message here...",
-                        hintStyle: TextStyle(color: Colors.grey),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeVertical * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 2),
+                      border: InputBorder.none, // Remove the border
+                      counterStyle: TextStyle(color: Colors.white),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            // onLongPressCancel: () {
+                            //   controller.recordButtonHandler(
+                            //       Colors.red, false,
+                            //       isRecordingCanceled: true);
+                            //   developer.log("long press cancel ");
+                            // },
+                            onLongPress: () {
+                              // controller.recordButtonHandler(
+                              //     Colors.deepOrangeAccent, true);
+                              controller.startListening();
 
-                        border: InputBorder.none, // Remove the border
-                        counterStyle: TextStyle(color: Colors.white),
-                        suffixIcon: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              // onLongPressCancel: () {
-                              //   controller.recordButtonHandler(
-                              //       Colors.red, false,
-                              //       isRecordingCanceled: true);
-                              //   developer.log("long press cancel ");
-                              // },
-                              onLongPress: () {
-                                // controller.recordButtonHandler(
-                                //     Colors.deepOrangeAccent, true);
-                                controller.startListening();
+                              developer.log("long press start ");
+                            },
+                            onLongPressUp: () {
+                              // controller.recordButtonHandler(
+                              //     Colors.lightBlueAccent, false);
+                              controller.stopListening();
 
-                                developer.log("long press start ");
+                              developer.log("long press end ");
+                            },
+                            // onLongPressEnd: (_) {
+                            //   controller.recordButtonHandler(
+                            //       Colors.lightBlueAccent, false);
+                            //   developer.log("long press end $_");
+                            // },
+                            child: Obx(() => AnimatedScale(
+                                  scale: controller.recordButtonColor.value ==
+                                          Colors.deepOrangeAccent
+                                      ? 1.15
+                                      : 1,
+                                  duration: Duration(seconds: 1),
+                                  child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 4),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: controller
+                                              .recordButtonColor.value),
+                                      child: Icon(Icons.mic)),
+                                )),
+                          ),
+                          Container(
+                            child: IconButton(
+                              onPressed: () async {
+                                await controller.sendMessageButton();
                               },
-                              onLongPressUp: () {
-                                // controller.recordButtonHandler(
-                                //     Colors.lightBlueAccent, false);
-                                controller.stopListening();
-
-                                developer.log("long press end ");
-                              },
-                              // onLongPressEnd: (_) {
-                              //   controller.recordButtonHandler(
-                              //       Colors.lightBlueAccent, false);
-                              //   developer.log("long press end $_");
-                              // },
-                              child: Obx(() => AnimatedScale(
-                                    scale: controller.recordButtonColor.value ==
-                                            Colors.deepOrangeAccent
-                                        ? 1.15
-                                        : 1,
-                                    duration: Duration(seconds: 1),
-                                    child: Container(
-                                        padding: EdgeInsets.all(8),
-                                        margin:
-                                            EdgeInsets.symmetric(horizontal: 4),
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: controller
-                                                .recordButtonColor.value),
-                                        child: Icon(Icons.mic)),
-                                  )),
+                              icon: Icon(
+                                Icons.send,
+                                color: Color(0xEEF37B38),
+                                // Color(
+                                //     0xFF25D366)
+                              ), // WhatsApp send button icon
                             ),
-                            Container(
-                              child: IconButton(
-                                onPressed: () async {
-                                  await controller.sendMessageButton();
-                                },
-                                icon: Icon(
-                                  Icons.send,
-                                  color: Color(0xEEF37B38),
-                                  // Color(
-                                  //     0xFF25D366)
-                                ), // WhatsApp send button icon
-                              ),
-                            ),
-                          ],
-                        ),
-                        // :
-                        // Container()
+                          ),
+                        ],
                       ),
+                      // :
+                      // Container()
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-    ).asGlass();
+    ).asGlass(
+        clipBorderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15), topRight: Radius.circular(15)));
   }
 
   Container _MessageBubble(
@@ -535,19 +555,64 @@ class GfChatView extends GetView<GfChatViewController> {
                             ),
                           ),
                         ),
-                        Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle, color: Colors.black38),
-                            child: IconButton(
-                                onPressed: () {
-                                  developer.log(
-                                      "message ${controller.chatList[index].message}");
-                                  developer
-                                      .log("${controller.gender_male.value}");
-                                  controller.playTextMessageSpeech(
-                                      controller.chatList[index].message);
-                                },
-                                icon: Icon(Icons.play_arrow_rounded)))
+                        index == -1 && controller.isWaitingForResponse.value
+                            ? Container()
+                            : index == -1
+                                ? controller.chatList[index + 1].isVoiceResponse
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.black38),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              developer.log(
+                                                  "message ${controller.chatList[index].message}");
+                                              developer.log(
+                                                  "${controller.gender_male.value}");
+                                              controller.playTextMessageSpeech(
+                                                  controller
+                                                      .chatList[index].message,
+                                                  index);
+                                            },
+                                            icon: controller.isSpeaking.value &&
+                                                    index ==
+                                                        controller
+                                                            .selectedIndex.value
+                                                ? Icon(Icons.pause)
+                                                : Icon(
+                                                    Icons.play_arrow_rounded)))
+                                    : Container()
+                                : controller.chatList[index].isVoiceResponse
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.black38),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              developer.log(
+                                                  "message ${controller.chatList[index].message}");
+                                              developer.log(
+                                                  "${controller.gender_male.value}");
+                                              if (controller.isSpeaking.value) {
+                                                controller
+                                                    .stopTextMessageSpeech();
+                                              } else {
+                                                controller
+                                                    .playTextMessageSpeech(
+                                                        controller
+                                                            .chatList[index]
+                                                            .message,
+                                                        index);
+                                              }
+                                            },
+                                            icon: controller.isSpeaking.value &&
+                                                    index ==
+                                                        controller
+                                                            .selectedIndex.value
+                                                ? Icon(Icons.pause)
+                                                : Icon(
+                                                    Icons.play_arrow_rounded)))
+                                    : Container()
                       ],
                     )
               // Icon(
@@ -564,7 +629,7 @@ class GfChatView extends GetView<GfChatViewController> {
                   : CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: message.length <= 30
+                  width: message.length <= 50
                       ? null
                       : SizeConfig.screenWidth * 0.8,
                   margin: EdgeInsets.symmetric(
@@ -621,15 +686,27 @@ class GfChatView extends GetView<GfChatViewController> {
                         alignment: isSender
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
-                        child:
-                            index == -1 && controller.isWaitingForResponse.value
-                                // true
-                                ? _typingIndicator()
-                                :
-                                // MarkdownWidget(
-                                //     data: controller.chatList[index].message,
-                                //   )
-                                Text(
+                        child: index == -1 &&
+                                controller.isWaitingForResponse.value
+                            // true
+                            ? _typingIndicator()
+                            :
+                            // MarkdownWidget(
+                            //     data: controller.chatList[index].message,
+                            //   )
+                            controller.chatList[index].isVoiceResponse &&
+                                    controller.chatList[index].senderType ==
+                                        SenderType.Bot
+                                ? HighlightedMessage(
+                                    message: message,
+                                    start:
+                                        controller.startIndexSpokenWord.value,
+                                    end: controller.endIndexSpokenWord.value,
+                                    selectedIndex:
+                                        controller.selectedIndex.value,
+                                    index: index,
+                                  )
+                                : Text(
                                     controller.chatList[index].message,
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -769,6 +846,64 @@ class GfChatView extends GetView<GfChatViewController> {
           ),
         );
       },
+    );
+  }
+}
+
+class HighlightedMessage extends StatelessWidget {
+  final String message;
+  final int start;
+  final int end;
+  final int selectedIndex;
+  final int index;
+
+  const HighlightedMessage({
+    Key? key,
+    required this.message,
+    required this.start,
+    required this.end,
+    required this.selectedIndex,
+    required this.index,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if ((start < 0 || end > message.length || start >= end) ||
+        selectedIndex != index) {
+      // Fallback in case indices are invalid
+      return RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            color: Colors.white,
+            height: 1.5,
+          ),
+          text: message,
+        ),
+      );
+    }
+
+    final String before = message.substring(0, start);
+    final String word = message.substring(start, end);
+    final String after = message.substring(end);
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          color: Colors.white,
+          height: 1.5, // Adjust this to your desired line spacing
+        ),
+        children: [
+          TextSpan(text: before),
+          TextSpan(
+            text: word,
+            style: const TextStyle(
+              color: Colors.lightBlueAccent,
+              fontWeight: FontWeight.bold,
+              // color: Colors.black,
+            ),
+          ),
+          TextSpan(text: after),
+        ],
+      ),
     );
   }
 }

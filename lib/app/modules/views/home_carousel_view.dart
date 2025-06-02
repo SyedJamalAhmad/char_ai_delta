@@ -107,13 +107,13 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                 ? guideWithOverlay(() {
                     controller.dismissOverlay1();
                   }, "assets/animations/tap-animation.gif",
-                    controller.isTransparent.value)
+                    controller.isTransparent.value, "Tap to chat")
                 : Container()),
             Obx(() => controller.showOverlay2.value
                 ? guideWithOverlay(() {
                     controller.dismissOverlay2();
                   }, "assets/animations/swipe-animation.gif",
-                    controller.isTransparent.value)
+                    controller.isTransparent.value, "Swipe to change character")
                 : Container()),
             Obx(() => controller.isShowOverlay3.value
                 ? tapGuide("assets/animations/tap-animation.gif",
@@ -123,8 +123,8 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
         ));
   }
 
-  GestureDetector guideWithOverlay(
-      Function onTapFunction, String imagePath, bool isTransparent) {
+  GestureDetector guideWithOverlay(Function onTapFunction, String imagePath,
+      bool isTransparent, String guideText) {
     return GestureDetector(
       onTap: () {
         onTapFunction();
@@ -157,7 +157,7 @@ class HomeCarouselView extends GetView<HomeViewCTL> {
                     child: Container(
                       margin: EdgeInsets.only(
                           bottom: SizeConfig.blockSizeVertical * 5),
-                      child: Text("Tap to continue"),
+                      child: Text(guideText),
                     ),
                   ),
           ],

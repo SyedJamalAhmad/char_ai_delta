@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:character_ai_delta/app/data/db_message.dart';
@@ -44,18 +45,28 @@ class ChatHistoryDatabaseHelper {
     print("Intializing DB....");
     String documentsDirectory = await getDatabasesPath();
     String path = join(documentsDirectory, "$_databaseName");
-    return await openDatabase(path, version: 3, onOpen: (db) {},
-        onCreate: (Database db, int version) async {
+    return await openDatabase(path, version: 4, onOpen: (db) {},
+        // onDowngrade: (db, oldVersion, newVersion) =>
+        //     developer.log("Downgrading DB...."),
+        onUpgrade: (Database db, int oldVersion, int newVersion) async {
+      if (oldVersion < 4) {
+        print("Upgrading DB....");
+        await db.execute(
+          '''
+            ALTER TABLE $_tableName ADD COLUMN isVoiceResponse Integer NOT NULL DEFAULT 0
+          ''',
+        );
+      }
+    }, onCreate: (Database db, int version) async {
       await db.execute(
         '''
           CREATE TABLE $_tableName (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             user_id TEXT NOT NULL,
             character_id TEXT NOT NULL,
             message TEXT NOT NULL,
-            type TEXT NOT NULL
-
+            type TEXT NOT NULL,
+            isVoiceResponse Integer NOT NULL DEFAULT 0
           )
         ''',
       );

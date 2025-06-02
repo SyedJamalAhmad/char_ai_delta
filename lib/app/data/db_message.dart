@@ -3,13 +3,14 @@ class DBMessage {
   final String characterId;
   final String message;
   final String senderType;
+  final bool isVoiceResponse;
 
-  DBMessage({
-    required this.userId,
-    required this.characterId,
-    required this.message,
-    required this.senderType,
-  });
+  DBMessage(
+      {required this.userId,
+      required this.characterId,
+      required this.message,
+      required this.senderType,
+      required this.isVoiceResponse});
 
   factory DBMessage.fromMap(Map<String, dynamic> map) {
     return DBMessage(
@@ -17,6 +18,7 @@ class DBMessage {
       characterId: map['character_id'] as String,
       message: map['message'] as String,
       senderType: map['type'] as String,
+      isVoiceResponse: map['isVoiceResponse'] == 1,
     );
   }
 
@@ -26,6 +28,7 @@ class DBMessage {
       'character_id': characterId,
       'message': message,
       'type': senderType,
+      'isVoiceResponse': isVoiceResponse ? 1 : 0,
     };
   }
 }
