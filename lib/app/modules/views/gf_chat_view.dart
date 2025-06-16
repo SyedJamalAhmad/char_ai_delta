@@ -287,7 +287,7 @@ class GfChatView extends GetView<GfChatViewController>
                   ),
                   Container(
                       // color: Colors.black,
-                      height: SizeConfig.screenHeight * 20,
+                      height: SizeConfig.screenHeight * 22,
                       child: _CustomeAppBar(context)),
                 ],
               ),
@@ -302,7 +302,7 @@ class GfChatView extends GetView<GfChatViewController>
       child: Container(
         padding: EdgeInsets.symmetric(
             horizontal: SizeConfig.blockSizeHorizontal * 3),
-        height: SizeConfig.blockSizeVertical * 20,
+        height: SizeConfig.blockSizeVertical * 22,
         color: const Color.fromARGB(26, 0, 0, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,

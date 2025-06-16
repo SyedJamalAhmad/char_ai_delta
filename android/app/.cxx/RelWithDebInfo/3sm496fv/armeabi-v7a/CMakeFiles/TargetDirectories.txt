@@ -1,0 +1,2 @@
+C:/IzzaTech/character_ai_delta/android/app/.cxx/RelWithDebInfo/3sm496fv/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/IzzaTech/character_ai_delta/android/app/.cxx/RelWithDebInfo/3sm496fv/armeabi-v7a/CMakeFiles/rebuild_cache.dir

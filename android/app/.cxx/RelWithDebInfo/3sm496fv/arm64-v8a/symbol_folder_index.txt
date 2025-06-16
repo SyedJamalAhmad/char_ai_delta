@@ -1,0 +1,1 @@
+C:\IzzaTech\character_ai_delta\build\app\intermediates\cxx\RelWithDebInfo\3sm496fv\obj\arm64-v8a
